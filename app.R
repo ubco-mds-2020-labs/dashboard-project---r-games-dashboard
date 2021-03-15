@@ -1,32 +1,34 @@
+library(ggplot2)
+library(plotly)
+library(dplyr)
 library(dash)
 library(dashCoreComponents)
 library(dashHtmlComponents)
 library(dashBootstrapComponents)
-library(ggplot2)
-library(plotly)
-library(reshape2)
-library(tidyverse)
 
-#Create App
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
 
-#Read in data/wrangle
-games <- readr::read_csv(here::here('data', 'vgsales.csv'))
-game_melt <- melt(data=games,id.vars = c("Rank","Name","Platform","Year","Genre","Publisher"),measure.vars=c("NA_Sales","EU_Sales","JP_Sales","Other_Sales","Global_Sales"))
-game_melt$Year <- as.integer(game_melt$Year)
-colnames(game_melt)[7] <- "Region"
-colnames(game_melt)[8] <- "Copies Sold"
+game <- readr::read_csv(here::here('data', 'vgsales.csv'))
+game$Year <- as.numeric(game$Year)
+game_melt <- tidyr::gather(game, key = "Region", value = "Sales", NA_Sales, EU_Sales, Global_Sales, JP_Sales, Other_Sales)
+genre_sales <- aggregate(Global_Sales ~ Genre, game, sum)
+sorted_genre_totalsales <- genre_sales[order(-genre_sales$Global_Sales),]$Genre
+
+#Data wrangling
+sales_data <- game_melt[!(game_melt$Region=="Global_Sales"),]
+sales_data_platform <- aggregate(Sales ~ Platform+Year+Genre+Region, game_melt, sum)
+sales_data_publisher <- aggregate(Sales ~ Publisher+Year+Genre+Region, game_melt, sum)
 
 #Nested Lists for Filters
-platform_filter <- unique(games$Platform) %>%
+platform_filter <- unique(game$Platform) %>%
     purrr::map(function(col) list(label = col, value = col))
 platform_filter <- append(platform_filter,list(list(label="All",value="all")))
 
-genre_filter <- unique(games$Genre) %>%
+genre_filter <- unique(game$Genre) %>%
     purrr::map(function(col) list(label = col, value = col))
 genre_filter <- append(genre_filter,list(list(label="All",value="all")))
 
-publisher_filter <- unique(games$Publisher) %>%
+publisher_filter <- unique(game$Publisher) %>%
     purrr::map(function(col) list(label = col, value = col))
 publisher_filter <- append(publisher_filter,list(list(label="All",value="all")))
 
@@ -200,4 +202,4 @@ app$callback(
     }
 )
 
-app$run_server(host = '0.0.0.0')
+app$run_server(host = '127.0.0.1')

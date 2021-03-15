@@ -33,12 +33,7 @@ app$layout(
     dbcContainer(
         list(
             htmlH1('Dashr heroky deployment'),
-            htmlLabel=("Plot 1"),
             dccGraph(id='plot-area'),
-            htmlBr(),
-            
-            htmlBr(),
-            htmlDiv(id='output-area2'),
             htmlBr(),
             htmlLabel("Select your region of interest:"),
             dccDropdown(
@@ -85,8 +80,7 @@ app$layout(
                              "2005" = "2005",
                              "2010" = "2010",
                              "2015" = "2015"),
-                value = list(1970,2017)),
-            htmlDiv(id = "test")
+                value = list(1980,2017))
         )
     )
 )
@@ -138,12 +132,10 @@ app$callback(
                 fill = Genre) + 
             geom_bar(stat="identity")+
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2)) +
-            xlab("Year")+
             ylab("Number of Copies Sold (in millions)")
         
         return (ggplotly(graph1))
     }
 )
-
 
 app$run_server(host = '0.0.0.0')

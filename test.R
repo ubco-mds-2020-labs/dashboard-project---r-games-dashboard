@@ -5,6 +5,7 @@ library(dashBootstrapComponents)
 library(ggplot2)
 library(plotly)
 library(reshape2)
+library(tidyverse)
 
 #Create App
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
@@ -33,7 +34,11 @@ app$layout(
     dbcContainer(
         list(
             htmlH1('Dashr heroky deployment'),
+            htmlLabel("Plot 1: Copies Sold vs Time"),
             dccGraph(id='plot-area'),
+            htmlBr(),
+            htmlLabel("Plot 2: Number of Games Released vs Time"),
+            dccGraph(id='plot-area2'),
             htmlBr(),
             htmlLabel("Select your region of interest:"),
             dccDropdown(
@@ -86,55 +91,112 @@ app$layout(
 )
 
 app$callback(
-     output('plot-area', 'figure'),
-     list(input('region_selector', 'value'),
-          input('platform_selector', 'value'),
-          input('genre_selector', 'value'),
-          input('publisher_selector', 'value'),
-          input('year_selector', 'value')),
-     function(reg,plat,gen,pub,years) {
-         # Input: List of Regions, Platforms, Genres, Publishers, Min and Max Year
-         # Output: Graph
-         #
-         # Create subset based on filters 
-         # Pass to graph
-         # Output graph
+    output('plot-area', 'figure'),
+    list(input('region_selector', 'value'),
+         input('platform_selector', 'value'),
+         input('genre_selector', 'value'),
+         input('publisher_selector', 'value'),
+         input('year_selector', 'value')),
+    function(reg,plat,gen,pub,years) {
+        # Input: List of Regions, Platforms, Genres, Publishers, Min and Max Year
+        # Output: Graph
+        #
+        # Create subset based on filters 
+        # Pass to graph
+        # Output graph
         if ("Global_Sales" %in% reg){
             filter_region = list("Global_Sales")
         } else {
             filter_region = reg
         }
-         if ("all" %in% plat){
-             filter_plat = unique(game_melt$Platform)
-         } else {
-             filter_plat = plat
-         }
-         if ("all" %in% gen){
-             filter_gen = unique(game_melt$Genre)
-         } else {
-             filter_gen = gen
-         }
-         if ("all" %in% pub){
-             filter_pub = unique(game_melt$Publisher)
-         } else {
-             filter_pub = pub
-         }
-         min_year = years[1]
-         max_year = years[2]
-         
-         graph1 <- game_melt[,3:8] %>% 
-             subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
-             group_by(Year,Genre) %>%
-             summarise("Copies Sold" = sum(`Copies Sold`)) %>% 
-             ggplot() +
-             aes(x=as.factor(Year),
-                 y=`Copies Sold`,
-                 fill = Genre) + 
-             geom_bar(stat="identity")+
-             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2)) +
-             ylab("Number of Copies Sold (in millions)")
-         
-         return (ggplotly(graph1))
+        if ("all" %in% plat){
+            filter_plat = unique(game_melt$Platform)
+        } else {
+            filter_plat = plat
+        }
+        if ("all" %in% gen){
+            filter_gen = unique(game_melt$Genre)
+        } else {
+            filter_gen = gen
+        }
+        if ("all" %in% pub){
+            filter_pub = unique(game_melt$Publisher)
+        } else {
+            filter_pub = pub
+        }
+        min_year = years[1]
+        max_year = years[2]
+        
+        graph1 <- game_melt[,3:8] %>% 
+            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+            group_by(Year,Genre) %>%
+            summarise("Copies Sold" = sum(`Copies Sold`)) %>% 
+            ggplot() +
+            aes(x=as.factor(Year),
+                y=`Copies Sold`,
+                fill = Genre) + 
+            geom_bar(stat="identity")+
+            theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2)) +
+            ylab("Number of Copies Sold (in millions)")+
+            xlab("Year")
+        
+        return (ggplotly(graph1))
+    }
+)
+
+#Callback for Plot2
+app$callback(
+    output('plot-area2', 'figure'),
+    list(input('region_selector', 'value'),
+         input('platform_selector', 'value'),
+         input('genre_selector', 'value'),
+         input('publisher_selector', 'value'),
+         input('year_selector', 'value')),
+    function(reg,plat,gen,pub,years) {
+        # Input: List of Regions, Platforms, Genres, Publishers, Min and Max Year
+        # Output: Graph
+        #
+        # Create subset based on filters 
+        # Pass to graph
+        # Output graph
+        if ("Global_Sales" %in% reg){
+            filter_region = list("Global_Sales")
+        } else {
+            filter_region = reg
+        }
+        if ("all" %in% plat){
+            filter_plat = unique(game_melt$Platform)
+        } else {
+            filter_plat = plat
+        }
+        if ("all" %in% gen){
+            filter_gen = unique(game_melt$Genre)
+        } else {
+            filter_gen = gen
+        }
+        if ("all" %in% pub){
+            filter_pub = unique(game_melt$Publisher)
+        } else {
+            filter_pub = pub
+        }
+        min_year = years[1]
+        max_year = years[2]
+        
+        graph2 <- game_melt[,3:8] %>% 
+            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+            group_by(Year,Genre) %>%
+            count(Year,Genre) %>%
+            rename(`Number of Releases`="n") %>% 
+            ggplot() +
+            aes(x=as.factor(Year),
+                y=`Number of Releases`,
+                fill = Genre) + 
+            geom_bar(stat="identity") +
+            theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
+            ylab("Number of Games Released")+
+            xlab("Year")
+        
+        return (ggplotly(graph2))
     }
 )
 

@@ -33,8 +33,10 @@ app$layout(
     dbcContainer(
         list(
             htmlH1('Dashr heroky deployment'),
+            htmlLabel=("Plot 1"),
             dccGraph(id='plot-area'),
-            htmlDiv(id='output-area'),
+            htmlBr(),
+            
             htmlBr(),
             htmlDiv(id='output-area2'),
             htmlBr(),
@@ -131,25 +133,16 @@ app$callback(
              group_by(Year,Genre) %>%
              summarise("Copies Sold" = sum(`Copies Sold`)) %>% 
              ggplot() +
-             aes(x=Year,
+             aes(x=as.factor(Year),
                  y=`Copies Sold`,
                  fill = Genre) + 
              geom_bar(stat="identity")+
              theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2)) +
+             xlab("Year")+
              ylab("Number of Copies Sold (in millions)")
          
          return (ggplotly(graph1))
     }
 )
-# 
-# app$callback(
-#     list(output('output-area', 'children'),
-#          output('output-area2', 'children')),
-#     list(input('plot-area', 'selectedData'),
-#          input('plot-area', 'hoverData')),
-#     function(selected_data, hover_data) {
-#         list(toString(selected_data), toString(hover_data))
-#     }
-# )
 
 app$run_server(debug=T)

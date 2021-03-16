@@ -32,66 +32,95 @@ publisher_filter <- unique(game$Publisher) %>%
     purrr::map(function(col) list(label = col, value = col))
 publisher_filter <- append(publisher_filter,list(list(label="All",value="all")))
 
-app$layout(
-    dbcContainer(
-        list(
-            htmlH1('Dashr heroky deployment'),
-            htmlLabel("Plot 1: Copies Sold vs Time"),
-            dccGraph(id='plot-area'),
-            htmlBr(),
-            htmlLabel("Plot 2: Number of Games Released vs Time"),
-            dccGraph(id='plot-area2'),
-            htmlBr(),
-            htmlLabel("Select your region of interest:"),
-            dccDropdown(
-                id='region_selector',
-                options = list(list(label="North America",value="NA_Sales"),
-                               list(label="Europe",value="EU_Sales"),
-                               list(label="Japan",value="JP_Sales"),
-                               list(label="Other",value="Other_Sales"),
-                               list(label="Global", value = "Global_Sales")),
-                value='Global_Sales',
-                multi=TRUE),
-            htmlBr(),
-            htmlLabel("Select your Platform of interest:"),
-            dccDropdown(
-                id='platform_selector',
-                options = platform_filter,
-                value="all",
-                multi=TRUE),
-            htmlBr(),
-            htmlLabel("Select your Genre of interest:"),
-            dccDropdown(
-                id='genre_selector',
-                options = genre_filter,
-                value="all",
-                multi=TRUE),
-            htmlBr(),
-            htmlLabel("Select your Publisher of interest:"),
-            dccDropdown(
-                id='publisher_selector',
-                options = publisher_filter,
-                value="all",
-                multi=TRUE),
-            htmlBr(),
-            htmlLabel('Slider'),
-            dccRangeSlider(
-                id = "year_selector",
-                min = 1980,
-                max = 2017,
-                marks = list("1980" = "1980",
-                             "1985" = "1985",
-                             "1990" = "1990",
-                             "1995" = "1995",
-                             "2000" = "2000",
-                             "2005" = "2005",
-                             "2010" = "2010",
-                             "2015" = "2015"),
-                value = list(1980,2017))
-        )
-    )
-)
+app$layout(htmlDiv(list(
+    dccTabs(id="tabs", children=list(
+        dccTab(label='Number of copies released', children=list(
+            htmlDiv(list(
+                htmlH1('Dashr heroky deployment'),
+                htmlLabel("Plot 1: Copies Sold vs Time"),
+                dccGraph(id='plot-area'),
+                htmlBr(),
+                htmlLabel("Plot 2: Number of Games Released vs Time"),
+                dccGraph(id='plot-area2'),
+                htmlBr(),
+                htmlLabel("Select your region of interest:"),
+                dccDropdown(
+                    id='region_selector',
+                    options = list(list(label="North America",value="NA_Sales"),
+                                   list(label="Europe",value="EU_Sales"),
+                                   list(label="Japan",value="JP_Sales"),
+                                   list(label="Other",value="Other_Sales"),
+                                   list(label="Global", value = "Global_Sales")),
+                    value='Global_Sales',
+                    multi=TRUE),
+                htmlBr(),
+                htmlLabel("Select your Platform of interest:"),
+                dccDropdown(
+                    id='platform_selector',
+                    options = platform_filter,
+                    value="all",
+                    multi=TRUE),
+                htmlBr(),
+                htmlLabel("Select your Genre of interest:"),
+                dccDropdown(
+                    id='genre_selector',
+                    options = genre_filter,
+                    value="all",
+                    multi=TRUE),
+                htmlBr(),
+                htmlLabel("Select your Publisher of interest:"),
+                dccDropdown(
+                    id='publisher_selector',
+                    options = publisher_filter,
+                    value="all",
+                    multi=TRUE),
+                htmlBr(),
+                htmlLabel('Slider'),
+                dccRangeSlider(
+                    id = "year_selector",
+                    min = 1980,
+                    max = 2017,
+                    marks = list("1980" = "1980",
+                                 "1985" = "1985",
+                                 "1990" = "1990",
+                                 "1995" = "1995",
+                                 "2000" = "2000",
+                                 "2005" = "2005",
+                                 "2010" = "2010",
+                                 "2015" = "2015"),
+                    value = list(1980,2017))
+            ))
+        )),
+        dccTab(label='Number of copies sold', children=list(
+            dccGraph(
+                id='example-graph-1',
+                figure=list(
+                    'data'= list(
+                        list('x'= c(1, 2, 3), 'y'= c(1, 4, 1),
+                             'type'= 'bar', 'name'= 'SF'),
+                        list('x'= c(1, 2, 3), 'y'= c(1, 2, 3),
+                             'type'= 'bar', 'name'= 'Montréal')
+                    )
+                )
+            )
+        )),
+        dccTab(label='Top Game titles, Platforms and Publishers across Genres', children=list(
+            dccGraph(
+                id='example-graph-2',
+                figure=list(
+                    'data'= list(
+                        list('x'= c(1, 2, 3), 'y'= c(1, 4, 1),
+                             'type'= 'bar', 'name'= 'SF'),
+                        list('x'= c(1, 2, 3), 'y'= c(1, 2, 3),
+                             'type'= 'bar', 'name'= 'Montréal')
+                    )
+                )
+            )
+        ))
+    ))
+)))
 
+#Callback for Plot1
 app$callback(
     output('plot-area', 'figure'),
     list(input('region_selector', 'value'),

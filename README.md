@@ -22,4 +22,4 @@ We are interested in implementing live updates to our table connected to our sou
 
 
 
-![Sketch](AppSketch.jpg)
+![Sketch](doc/AppSketch.jpg)

@@ -5,19 +5,26 @@ library(dash)
 library(dashCoreComponents)
 library(dashHtmlComponents)
 library(dashBootstrapComponents)
+library(reshape2)
+library(tidyverse)
 
+#Create App
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
 
+#Read in data/wrangle
 game <- readr::read_csv(here::here('data', 'vgsales.csv'))
-game$Year <- as.numeric(game$Year)
-game_melt <- tidyr::gather(game, key = "Region", value = "Sales", NA_Sales, EU_Sales, Global_Sales, JP_Sales, Other_Sales)
-genre_sales <- aggregate(Global_Sales ~ Genre, game, sum)
-sorted_genre_totalsales <- genre_sales[order(-genre_sales$Global_Sales),]$Genre
+game_melt <- melt(data=game,id.vars = c("Rank","Name","Platform","Year","Genre","Publisher"),measure.vars=c("NA_Sales","EU_Sales","JP_Sales","Other_Sales","Global_Sales"))
+game_melt$Year <- as.integer(game_melt$Year)
+colnames(game_melt)[7] <- "Region"
+colnames(game_melt)[8] <- "Copies Sold"
+#game_melt <- tidyr::gather(game, key = "Region", value = "Sales", NA_Sales, EU_Sales, Global_Sales, JP_Sales, Other_Sales)
+#genre_sales <- aggregate(Global_Sales ~ Genre, game, sum)
+#sorted_genre_totalsales <- genre_sales[order(-genre_sales$Global_Sales),]$Genre
 
 #Data wrangling
-sales_data <- game_melt[!(game_melt$Region=="Global_Sales"),]
-sales_data_platform <- aggregate(Sales ~ Platform+Year+Genre+Region, game_melt, sum)
-sales_data_publisher <- aggregate(Sales ~ Publisher+Year+Genre+Region, game_melt, sum)
+#sales_data <- game_melt[!(game_melt$Region=="Global_Sales"),]
+#sales_data_platform <- aggregate(Sales ~ Platform+Year+Genre+Region, game_melt, sum)
+#sales_data_publisher <- aggregate(Sales ~ Publisher+Year+Genre+Region, game_melt, sum)
 
 #Nested Lists for Filters
 platform_filter <- unique(game$Platform) %>%

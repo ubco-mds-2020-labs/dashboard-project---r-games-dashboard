@@ -68,6 +68,9 @@ graph3 <- game_melt %>%
     theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
     ylab("Counts of Genres, Publishers and Platforms")
 ggplotly(graph3)
+x<-1
+y<-list(x)
+is.list(y)
 ```
 
 ```{r}

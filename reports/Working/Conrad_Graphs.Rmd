@@ -167,20 +167,22 @@ testfxc2 <-function(reg,plat,gen,pub,years) {
 ```
 
 ```{r}
-filter_region = list("Global_Sales")
-filter_plat = unique(game_melt$Platform)
+filter_region = list("JP_Sales")
+filter_plat = list("N64")
 filter_gen = unique(game_melt$Genre)
 filter_pub = unique(game_melt$Publisher)
-testfxc2("NA_Sales","all","all","all",list(1980,2017))
-
+min_year = 1980
+max_year = 1990
+test <- game_melt %>% 
+    subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year)
+dim(test)
 ```
-
 ```{r}
-game_melt[,3:8] %>% 
-            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
-            group_by(Year,Genre) %>%
-            count(Year,Genre) %>%
-            rename(`Number of Releases`="n")
+x <- game_melt %>% #Initialize Top Genre Card (Tab3)
+    group_by(Genre) %>%
+    summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+    subset(`Copies Sold`== max(`Copies Sold`))
+x[1]
 ```
 
 

@@ -1,12 +1,12 @@
-library(ggplot2)
-library(plotly)
-library(dplyr)
 library(dash)
 library(dashCoreComponents)
 library(dashHtmlComponents)
 library(dashBootstrapComponents)
 library(reshape2)
 library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(dplyr)
 
 #Create App
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
@@ -126,7 +126,7 @@ app$layout(htmlDiv(list(
         )),
         dccTab(label='Top Game titles, Platforms and Publishers across Genres', children=list(
             htmlDiv(list(
-                # htmlH1('AAMIR DATA'),
+                #htmlH1('AAMIR DATA'),
                 htmlLabel("Plot 5: Copies Sold vs Genre"),
                 dccGraph(id='plot-area5'),
                 htmlBr(),

@@ -26,6 +26,25 @@ colnames(game_melt)[8] <- "Copies Sold"
 sales_data <- game_melt[!(game_melt$Region=="Global_Sales"),]
 #sales_data_platform <- aggregate(Sales ~ Platform+Year+Genre+Region, game_melt, sum)
 #sales_data_publisher <- aggregate(Sales ~ Publisher+Year+Genre+Region, game_melt, sum)
+top_game_init <- game_melt %>% #Initialize Top Game Card (Tab3)
+    group_by(Name) %>%
+    summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+    subset(`Copies Sold`== max(`Copies Sold`))
+
+top_genre_init <- game_melt %>% #Initialize Top Genre Card (Tab3)
+    group_by(Genre) %>%
+    summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+    subset(`Copies Sold`== max(`Copies Sold`))
+
+top_platform_init <- game_melt %>% #Initialize Top Platform Card (Tab3)
+    group_by(Platform) %>%
+    summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+    subset(`Copies Sold`== max(`Copies Sold`))
+
+top_publisher_init <- game_melt %>% #Initialize Top Publisher Card (Tab3)
+    group_by(Publisher) %>%
+    summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+    subset(`Copies Sold`== max(`Copies Sold`))
 
 #Nested Lists for Filters
 platform_filter <- unique(game$Platform) %>%
@@ -126,18 +145,69 @@ app$layout(htmlDiv(list(
         )),
         dccTab(label='Top Game titles, Platforms and Publishers across Genres', children=list(
             htmlDiv(list(
-                #htmlH1('AAMIR DATA'),
-                htmlLabel("Plot 5: Copies Sold vs Genre"),
-                dccGraph(id='plot-area5'),
-                htmlBr(),
-                htmlLabel("Select your feature of interest"),
-                dccDropdown(
-                    id='popular_selector',
-                    options = list(list(label="Game Title",value="Game_Title"),
-                                   list(label="Platform",value="Platform"),
-                                   list(label="Publisher",value="Publisher")),
-                    value="Game_Title",
-                    multi=FALSE)
+                dbcContainer(list(
+                    dbcRow(list(
+                        dbcCol(list(
+                            dbcCard(list(
+                                dbcCardHeader("Game with most copies sold:"),
+                                dbcCardBody(list(
+                                    htmlH5(id="top_game",
+                                           top_game_init$Name),
+                                    htmlP(id="top_game_sales",
+                                          sprintf("%.2f million copies sold",top_game_init$`Copies Sold`))
+                                ))
+                            ),
+                            color="primary",
+                            inverse=TRUE
+                            ),
+                            dbcCard(list(
+                                dbcCardHeader("Genre with Most Copies Sold"),
+                                dbcCardBody(list(
+                                    htmlH5(id="top_genre",
+                                           top_genre_init$Genre),
+                                    htmlP(id="top_genre_sales",
+                                          sprintf("%.2f million copies sold",top_genre_init$`Copies Sold`))
+                                ))
+                            ),
+                            color="secondary",
+                            inverse=TRUE
+                            ),
+                            dbcCard(list(
+                                dbcCardHeader("Platform with Most Copies Sold"),
+                                dbcCardBody(list(
+                                    htmlH5(id="top_platform",
+                                           top_platform_init$Platform),
+                                    htmlP(id="top_platform_sales",
+                                          sprintf("%.2f million copies sold",top_platform_init$`Copies Sold`))
+                                ))
+                            ),
+                            color="info",
+                            inverse=TRUE
+                            ),
+                            dbcCard(list(
+                                dbcCardHeader("Publisher with Most Copies Sold"),
+                                dbcCardBody(list(
+                                    htmlH5(id="top_publisher",
+                                           top_publisher_init$Publisher),
+                                    htmlP(id="top_publisher_sales",
+                                          sprintf("%.2f million copies sold",top_publisher_init$`Copies Sold`))
+                                ))
+                            ),
+                            color="success",
+                            inverse=TRUE
+                            )
+                        ),width=3),
+                        dbcCol(list(
+                            dbcCard(
+                                dbcCardBody(list(
+                                    htmlH1("Top Game is:"),
+                                    htmlP("Answer"),
+                                    htmlP("# of Sales")
+                                ))
+                            )    
+                        ))
+                    ))
+                ))
             ))
         ))
     ))
@@ -157,6 +227,79 @@ app$callback(
         #
         #If clicked - return default values to filters
         return (list("Global_Sales","all","all","all",list(1980,2017)))
+    }
+)
+
+#Callback for Cards (Tab 3)
+app$callback(
+    list(output('top_game', 'children'),
+         output("top_game_sales","children"),
+         output('top_genre','children'),
+         output('top_genre_sales','children'),
+         output('top_platform','children'),
+         output('top_platform_sales','children'),
+         output('top_publisher','children'),
+         output('top_publisher_sales','children')),
+    list(input('region_selector', 'value'),
+         input('platform_selector', 'value'),
+         input('genre_selector', 'value'),
+         input('publisher_selector', 'value'),
+         input('year_selector', 'value')),
+    function(reg,plat,gen,pub,years) {
+        #Input: List of Regions, Platforms, Genres, Publishers, Min and Max Year
+        #Output: Name & Sales of Top Game
+        #
+        if ("Global_Sales" %in% reg){
+            filter_region = list("Global_Sales")
+        } else {
+            filter_region = reg
+        }
+        if ("all" %in% plat){
+            filter_plat = unique(game_melt$Platform)
+        } else {
+            filter_plat = plat
+        }
+        if ("all" %in% gen){
+            filter_gen = unique(game_melt$Genre)
+        } else {
+            filter_gen = gen
+        }
+        if ("all" %in% pub){
+            filter_pub = unique(game_melt$Publisher)
+        } else {
+            filter_pub = pub
+        }
+        min_year = years[1]
+        max_year = years[2]
+        
+        top_game <- game_melt %>% 
+            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+            group_by(Name) %>%
+            summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+            subset(`Copies Sold`== max(`Copies Sold`))
+        
+        top_genre <- game_melt %>% 
+            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+            group_by(Genre) %>%
+            summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+            subset(`Copies Sold`== max(`Copies Sold`))
+        
+        top_publisher <- game_melt %>% 
+            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+            group_by(Publisher) %>%
+            summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+            subset(`Copies Sold`== max(`Copies Sold`))
+        
+        top_platform <- game_melt %>% 
+            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+            group_by(Platform) %>%
+            summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+            subset(`Copies Sold`== max(`Copies Sold`))
+        
+        return (list(top_game$Name,sprintf("%.2f million copies sold",top_game$`Copies Sold`),
+                     top_genre$Genre,sprintf("%.2f million copies sold",top_genre$`Copies Sold`),
+                     top_platform$Platform,sprintf("%.2f million copies sold",top_platform$`Copies Sold`),
+                     top_publisher$Publisher,sprintf("%.2f million copies sold",top_publisher$`Copies Sold`)))
     }
 )
 
@@ -290,49 +433,49 @@ app$callback(
     }
 )
 
-#Callback for Plot5
-app$callback(
-    output('plot-area5', 'figure'),
-    list(input('popular_selector', 'value')),
-    function(plot_type) {
-        # Input: List of Regions
-        # Output: Graph
-        #
-        if (plot_type == "Game_Title"){
-            graph4 <- sales_data %>% 
-                ggplot() +
-                aes(x=reorder(Genre,-`Copies Sold`), y=`Copies Sold`) + 
-                geom_point() +
-                geom_text(aes(label=ifelse(`Copies Sold`>max(`Copies Sold`)*0.35,as.character(Name),'')),hjust=-0.1, vjust=0) +
-                theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
-                ylab("Number of Copies Sold (in millions)") +
-                xlab("Genre")
-        } else if (plot_type == "Publisher") {
-            graph4 <- sales_data %>%
-                group_by(Genre, Publisher) %>%
-                summarise(net_sales = sum(`Copies Sold`), `.groups` = 'keep') %>%
-                ggplot() +
-                aes(x=reorder(Genre,-net_sales), y=net_sales) +
-                geom_point() +
-                geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Publisher),'')),hjust=-0.1, vjust=0) +
-                theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
-                ylab("Number of Copies Sold (in millions)") +
-                xlab("Genre")
-        } else if (plot_type == "Platform") {
-            graph4 <- sales_data %>%
-                group_by(Genre, Platform) %>%
-                summarise(net_sales = sum(`Copies Sold`), `.groups` = 'keep') %>%
-                ggplot() +
-                aes(x=reorder(Genre,-net_sales), y=net_sales) +
-                geom_point() +
-                geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Platform),'')),hjust=-0.1, vjust=0) +
-                theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
-                ylab("Number of Copies Sold (in millions)") +
-                xlab("Genre")
-        }
-        
-        return (ggplotly(graph4))
-    }
-)
+# #Callback for Plot5
+# app$callback(
+#     output('plot-area5', 'figure'),
+#     list(input('popular_selector', 'value')),
+#     function(plot_type) {
+#         # Input: List of Regions
+#         # Output: Graph
+#         #
+#         if (plot_type == "Game_Title"){
+#             graph4 <- sales_data %>% 
+#                 ggplot() +
+#                 aes(x=reorder(Genre,-`Copies Sold`), y=`Copies Sold`) + 
+#                 geom_point() +
+#                 geom_text(aes(label=ifelse(`Copies Sold`>max(`Copies Sold`)*0.35,as.character(Name),'')),hjust=-0.1, vjust=0) +
+#                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
+#                 ylab("Number of Copies Sold (in millions)") +
+#                 xlab("Genre")
+#         } else if (plot_type == "Publisher") {
+#             graph4 <- sales_data %>%
+#                 group_by(Genre, Publisher) %>%
+#                 summarise(net_sales = sum(`Copies Sold`), `.groups` = 'keep') %>%
+#                 ggplot() +
+#                 aes(x=reorder(Genre,-net_sales), y=net_sales) +
+#                 geom_point() +
+#                 geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Publisher),'')),hjust=-0.1, vjust=0) +
+#                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
+#                 ylab("Number of Copies Sold (in millions)") +
+#                 xlab("Genre")
+#         } else if (plot_type == "Platform") {
+#             graph4 <- sales_data %>%
+#                 group_by(Genre, Platform) %>%
+#                 summarise(net_sales = sum(`Copies Sold`), `.groups` = 'keep') %>%
+#                 ggplot() +
+#                 aes(x=reorder(Genre,-net_sales), y=net_sales) +
+#                 geom_point() +
+#                 geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Platform),'')),hjust=-0.1, vjust=0) +
+#                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
+#                 ylab("Number of Copies Sold (in millions)") +
+#                 xlab("Genre")
+#         }
+#         
+#         return (ggplotly(graph4))
+#     }
+# )
 
 app$run_server(host = '127.0.0.1')

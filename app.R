@@ -90,11 +90,11 @@ dropdown_genre = dccDropdown(id='genre_selector',options = genre_filter,value="a
 dropdown_publisher = dccDropdown(id='publisher_selector',options = publisher_filter,value="all",multi=TRUE)
 
 dropdown_gamechoice = dccDropdown(id='popular_selector',
-    options = list(list(label="Game Title",value="Game_Title"),
-                   list(label="Publisher",value="Publisher"),
-                   list(label="Platform",value="Platform")),
-    value='Game_Title',
-    multi=FALSE)
+                                  options = list(list(label="Game Title",value="Game_Title"),
+                                                 list(label="Publisher",value="Publisher"),
+                                                 list(label="Platform",value="Platform")),
+                                  value='Game_Title',
+                                  multi=FALSE)
 
 # Range slider modules
 
@@ -110,6 +110,20 @@ range_slider_timeseries = dccRangeSlider(id = "year_selector",
                                                       "2010" = "2010",
                                                       "2015" = "2015"),
                                          value = list(1980,2017))
+
+range_slider_timeseries_2 = dccRangeSlider(id = "year_selector_2",
+                                         min = 1980,
+                                         max = 2017,
+                                         marks = list("1980" = "1980",
+                                                      "1985" = "1985",
+                                                      "1990" = "1990",
+                                                      "1995" = "1995",
+                                                      "2000" = "2000",
+                                                      "2005" = "2005",
+                                                      "2010" = "2010",
+                                                      "2015" = "2015"),
+                                         value = list(1980,2017))
+
 
 clearing_filters_button = dbcButton("Reset Filters",id="reset_button")
 
@@ -148,10 +162,8 @@ first_tab_sidebar_Card_2 = dbcCard(
              dropdown_genre,
              htmlBr(),
              htmlLabel("Select your Publisher of interest:"),
-             dropdown_publisher,
-             htmlBr(),
-             htmlLabel("Select your choice of interest:"),
-             dropdown_gamechoice
+             dropdown_publisher
+             
         )
     ))
 )
@@ -190,6 +202,9 @@ tab_3 = dccTab(label='Top Game titles, Platforms and Publishers across Genres', 
     htmlDiv(list(
         # Plot 5 DATA SLOW ONE
         htmlLabel("Plot 5: Top Choice vs Genre"),
+        htmlBr(),
+        htmlLabel("Select your choice of interest:"),
+        dropdown_gamechoice,
         dccGraph(id='plot-area5'),
         htmlBr(),
         htmlBr(),
@@ -366,6 +381,11 @@ app$callback(
 )
 
 #Callback for all plots
+
+
+
+
+
 app$callback(
     list(output('plot-area', 'figure'),
          output('plot-area2', 'figure'),
@@ -465,6 +485,10 @@ app$callback(
     }
 )
 
+#Callback for linking time sliders
+
+
+
 #Callback for Plot4
 app$callback(
     output('plot-area4', 'figure'),
@@ -537,7 +561,7 @@ app$callback(
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
         }
-
+        
         return (ggplotly(graph4))
     }
 )

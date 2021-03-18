@@ -273,26 +273,25 @@ app$callback(
         min_year = years[1]
         max_year = years[2]
         
-        top_game <- game_melt %>% 
-            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+        filtered_subset <- game_melt %>% 
+            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year)
+        
+        top_game <-  filtered_subset %>%
             group_by(Name) %>%
             summarise("Copies Sold" = sum(`Copies Sold`)) %>%
             subset(`Copies Sold`== max(`Copies Sold`))
         
-        top_genre <- game_melt %>% 
-            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+        top_genre <- filtered_subset %>%
             group_by(Genre) %>%
             summarise("Copies Sold" = sum(`Copies Sold`)) %>%
             subset(`Copies Sold`== max(`Copies Sold`))
         
-        top_publisher <- game_melt %>% 
-            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+        top_publisher <- filtered_subset %>%
             group_by(Publisher) %>%
             summarise("Copies Sold" = sum(`Copies Sold`)) %>%
             subset(`Copies Sold`== max(`Copies Sold`))
         
-        top_platform <- game_melt %>% 
-            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+        top_platform <- filtered_subset %>%
             group_by(Platform) %>%
             summarise("Copies Sold" = sum(`Copies Sold`)) %>%
             subset(`Copies Sold`== max(`Copies Sold`))

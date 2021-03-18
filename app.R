@@ -7,6 +7,7 @@ library(tidyverse)
 library(ggplot2)
 library(plotly)
 library(dplyr)
+library(data.table)
 
 #Create App
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
@@ -145,6 +146,21 @@ app$layout(htmlDiv(list(
         )),
         dccTab(label='Top Game titles, Platforms and Publishers across Genres', children=list(
             htmlDiv(list(
+                # Plot 5 DATA SLOW ONE
+                htmlLabel("Plot 5: Top Choice vs Genre"),
+                dccGraph(id='plot-area5'),
+                htmlBr(),
+                htmlLabel("Select your choice of interest:"),
+                dccDropdown(
+                    id='popular_selector',
+                    options = list(list(label="Game Title",value="Game_Title"),
+                                   list(label="Publisher",value="Publisher"),
+                                   list(label="Platform",value="Platform")),
+                    value='Game_Title',
+                    multi=FALSE),
+                htmlBr(),
+                htmlBr(),
+                # Top Score Cards
                 dbcContainer(list(
                     dbcRow(list(
                         dbcCol(list(
@@ -433,49 +449,52 @@ app$callback(
     }
 )
 
-# #Callback for Plot5
-# app$callback(
-#     output('plot-area5', 'figure'),
-#     list(input('popular_selector', 'value')),
-#     function(plot_type) {
-#         # Input: List of Regions
-#         # Output: Graph
-#         #
-#         if (plot_type == "Game_Title"){
-#             graph4 <- sales_data %>% 
-#                 ggplot() +
-#                 aes(x=reorder(Genre,-`Copies Sold`), y=`Copies Sold`) + 
-#                 geom_point() +
-#                 geom_text(aes(label=ifelse(`Copies Sold`>max(`Copies Sold`)*0.35,as.character(Name),'')),hjust=-0.1, vjust=0) +
-#                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
-#                 ylab("Number of Copies Sold (in millions)") +
-#                 xlab("Genre")
-#         } else if (plot_type == "Publisher") {
-#             graph4 <- sales_data %>%
-#                 group_by(Genre, Publisher) %>%
-#                 summarise(net_sales = sum(`Copies Sold`), `.groups` = 'keep') %>%
-#                 ggplot() +
-#                 aes(x=reorder(Genre,-net_sales), y=net_sales) +
-#                 geom_point() +
-#                 geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Publisher),'')),hjust=-0.1, vjust=0) +
-#                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
-#                 ylab("Number of Copies Sold (in millions)") +
-#                 xlab("Genre")
-#         } else if (plot_type == "Platform") {
-#             graph4 <- sales_data %>%
-#                 group_by(Genre, Platform) %>%
-#                 summarise(net_sales = sum(`Copies Sold`), `.groups` = 'keep') %>%
-#                 ggplot() +
-#                 aes(x=reorder(Genre,-net_sales), y=net_sales) +
-#                 geom_point() +
-#                 geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Platform),'')),hjust=-0.1, vjust=0) +
-#                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
-#                 ylab("Number of Copies Sold (in millions)") +
-#                 xlab("Genre")
-#         }
-#         
-#         return (ggplotly(graph4))
-#     }
-# )
+#Callback for Plot5
+app$callback(
+    output('plot-area5', 'figure'),
+    list(input('popular_selector', 'value')),
+    function(plot_type) {
+        # Input: List of Regions
+        # Output: Graph
+        #
+        
+        sales_sub <- data.table(sales_data, key="Genre")[, head(.SD, 30), by=Genre]
+        
+        if (plot_type == "Game_Title"){
+            graph4 <- sales_sub %>%
+                ggplot() +
+                aes(x=reorder(Genre,-`Copies Sold`), y=`Copies Sold`) +
+                geom_point() +
+                geom_text(aes(label=ifelse(`Copies Sold`>max(`Copies Sold`)*0.35,as.character(Name),'')),hjust=-0.1, vjust=0) +
+                theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
+                ylab("Number of Copies Sold (in millions)") +
+                xlab("Genre")
+        } else if (plot_type == "Publisher") {
+            graph4 <- sales_sub %>%
+                group_by(Genre, Publisher) %>%
+                summarise(net_sales = sum(`Copies Sold`), `.groups` = 'keep') %>%
+                ggplot() +
+                aes(x=reorder(Genre,-net_sales), y=net_sales) +
+                geom_point() +
+                geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Publisher),'')),hjust=-0.1, vjust=0) +
+                theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
+                ylab("Number of Copies Sold (in millions)") +
+                xlab("Genre")
+        } else if (plot_type == "Platform") {
+            graph4 <- sales_sub %>%
+                group_by(Genre, Platform) %>%
+                summarise(net_sales = sum(`Copies Sold`), `.groups` = 'keep') %>%
+                ggplot() +
+                aes(x=reorder(Genre,-net_sales), y=net_sales) +
+                geom_point() +
+                geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Platform),'')),hjust=-0.1, vjust=0) +
+                theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
+                ylab("Number of Copies Sold (in millions)") +
+                xlab("Genre")
+        }
+
+        return (ggplotly(graph4))
+    }
+)
 
 app$run_server(host = '127.0.0.1')

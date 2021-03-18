@@ -395,7 +395,6 @@ app$callback(
         graph2<-ggplotly(graph2,tooltip="text")
         
         graph3 <- filtered_game_melt %>%
-            group_by(Year)%>%
             melt(id.vars=c("Year"),measure.vars=c("Genre","Platform","Publisher")) %>%
             rename(Category='variable') %>% 
             group_by(Year,Category) %>%

@@ -19,7 +19,7 @@ game <- read_csv('data/vgsales.csv')
 game_melt <- melt(data=game,id.vars = c("Rank","Name","Platform","Year","Genre","Publisher"),measure.vars=c("NA_Sales","EU_Sales","JP_Sales","Other_Sales","Global_Sales"))
 game_melt$Year <- as.integer(game_melt$Year)
 colnames(game_melt)[7] <- "Region"
-colnames(game_melt)[8] <- "Copies Sold"
+colnames(game_melt)[8] <- "Copies_Sold"
 
 #game_melt <- tidyr::gather(game, key = "Region", value = "Sales", NA_Sales, EU_Sales, Global_Sales, JP_Sales, Other_Sales)
 #genre_sales <- aggregate(Global_Sales ~ Genre, game, sum)
@@ -31,22 +31,22 @@ sales_data <- game_melt[!(game_melt$Region=="Global_Sales"),]
 #sales_data_publisher <- aggregate(Sales ~ Publisher+Year+Genre+Region, game_melt, sum)
 top_game_init <- game_melt %>% #Initialize Top Game Card (Tab3)
     group_by(Name) %>%
-    summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+    summarise("Copies Sold" = sum(`Copies_Sold`)) %>%
     subset(`Copies Sold`== max(`Copies Sold`))
 
 top_genre_init <- game_melt %>% #Initialize Top Genre Card (Tab3)
     group_by(Genre) %>%
-    summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+    summarise("Copies Sold" = sum(`Copies_Sold`)) %>%
     subset(`Copies Sold`== max(`Copies Sold`))
 
 top_platform_init <- game_melt %>% #Initialize Top Platform Card (Tab3)
     group_by(Platform) %>%
-    summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+    summarise("Copies Sold" = sum(`Copies_Sold`)) %>%
     subset(`Copies Sold`== max(`Copies Sold`))
 
 top_publisher_init <- game_melt %>% #Initialize Top Publisher Card (Tab3)
     group_by(Publisher) %>%
-    summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+    summarise("Copies Sold" = sum(`Copies_Sold`)) %>%
     subset(`Copies Sold`== max(`Copies Sold`))
 
 #Nested Lists for Filters
@@ -185,7 +185,7 @@ tab_2 = dccTab(label='Number of copies sold', children=list(
     ))
 ))
 
-tab_3 = dccTab(label='Top Game titles, Platforms and Publishers across Genres', children=list(
+tab_3 = dccTab(label='Top Game titles, Platforms, Publishers and Genres', children=list(
     htmlDiv(list(
         # Plot 5 DATA SLOW ONE
         htmlLabel("Plot 5: Top Choice vs Genre"),
@@ -272,7 +272,6 @@ app$layout(dbcRow(list(
             ))
         ))
         ))), width = 9)
-    
 )))
 
 
@@ -342,22 +341,22 @@ app$callback(
         
         top_game <-  filtered_subset %>%
             group_by(Name) %>%
-            summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+            summarise("Copies Sold" = sum(`Copies_Sold`)) %>%
             subset(`Copies Sold`== max(`Copies Sold`))
         
         top_genre <- filtered_subset %>%
             group_by(Genre) %>%
-            summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+            summarise("Copies Sold" = sum(`Copies_Sold`)) %>%
             subset(`Copies Sold`== max(`Copies Sold`))
         
         top_publisher <- filtered_subset %>%
             group_by(Publisher) %>%
-            summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+            summarise("Copies Sold" = sum(`Copies_Sold`)) %>%
             subset(`Copies Sold`== max(`Copies Sold`))
         
         top_platform <- filtered_subset %>%
             group_by(Platform) %>%
-            summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+            summarise("Copies Sold" = sum(`Copies_Sold`)) %>%
             subset(`Copies Sold`== max(`Copies Sold`))
         
         return (list(top_game$Name,sprintf("%.2f million copies sold",top_game$`Copies Sold`),
@@ -417,7 +416,7 @@ app$callback(
         
         graph1 <-  filtered_game_melt %>%
             group_by(Year,Genre) %>%
-            summarise("Copies Sold" = sum(`Copies Sold`)) %>% 
+            summarise("Copies Sold" = sum(`Copies_Sold`)) %>% 
             ggplot() +
             aes(x=as.factor(Year),
                 y=`Copies Sold`,
@@ -427,7 +426,6 @@ app$callback(
                              "<br>Genre: ", Genre)) + 
             geom_bar(stat="identity")+
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2)) +
-            scale_color_brewer(palette = "PuOr") +
             #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Copies Sold (in millions)")+
             xlab("Year")
@@ -496,7 +494,7 @@ app$callback(
         graph3 <- sales_data[,3:8] %>% 
             subset(Region %in% region_filter) %>%
             group_by(Genre) %>%
-            summarize(genre_sales = sum(`Copies Sold`)) %>%
+            summarize(genre_sales = sum(Copies_Sold)) %>%
             ggplot() +
             aes(x=reorder(Genre,-genre_sales),
                 y=genre_sales) + 
@@ -524,9 +522,9 @@ app$callback(
         if (plot_type == "Game_Title"){
             graph4 <- sales_sub %>%
                 ggplot() +
-                aes(x=reorder(Genre,-`Copies Sold`), y=`Copies Sold`) +
+                aes(x=reorder(Genre,-Copies_Sold), y=Copies_Sold) +
                 geom_point() +
-                geom_text(aes(label=ifelse(`Copies Sold`>max(`Copies Sold`)*0.35,as.character(Name),'')),hjust=-0.1, vjust=0) +
+                geom_text(aes(label=ifelse(Copies_Sold>max(Copies_Sold)*0.35,as.character(Name),'')),hjust=-0.1, vjust=0) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
                 #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 ylab("Number of Copies Sold (in millions)") +
@@ -534,7 +532,7 @@ app$callback(
         } else if (plot_type == "Publisher") {
             graph4 <- sales_sub %>%
                 group_by(Genre, Publisher) %>%
-                summarise(net_sales = sum(`Copies Sold`), `.groups` = 'keep') %>%
+                summarise(net_sales = sum(Copies_Sold), `.groups` = 'keep') %>%
                 ggplot() +
                 aes(x=reorder(Genre,-net_sales), y=net_sales) +
                 geom_point() +
@@ -546,7 +544,7 @@ app$callback(
         } else if (plot_type == "Platform") {
             graph4 <- sales_sub %>%
                 group_by(Genre, Platform) %>%
-                summarise(net_sales = sum(`Copies Sold`), `.groups` = 'keep') %>%
+                summarise(net_sales = sum(Copies_Sold), `.groups` = 'keep') %>%
                 ggplot() +
                 aes(x=reorder(Genre,-net_sales), y=net_sales) +
                 geom_point() +
@@ -561,4 +559,4 @@ app$callback(
     }
 )
 
-app$run_server(host = '0.0.0.0')
+app$run_server(debug=T)

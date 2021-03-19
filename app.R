@@ -13,7 +13,9 @@ library(data.table)
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
 
 #Read in data/wrangle
-game <- readr::read_csv(here::here('data', 'vgsales.csv'))
+#game <- readr::read_csv(here::here('data', 'vgsales.csv'))
+
+game <- read_csv('data/vgsales.csv')
 game_melt <- melt(data=game,id.vars = c("Rank","Name","Platform","Year","Genre","Publisher"),measure.vars=c("NA_Sales","EU_Sales","JP_Sales","Other_Sales","Global_Sales"))
 game_melt$Year <- as.integer(game_melt$Year)
 colnames(game_melt)[7] <- "Region"
@@ -60,174 +62,221 @@ publisher_filter <- unique(game$Publisher) %>%
     purrr::map(function(col) list(label = col, value = col))
 publisher_filter <- append(publisher_filter,list(list(label="All",value="all")))
 
-app$layout(htmlDiv(list(
-    dccTabs(id="tabs", children=list(
-        dccTab(label='Number of copies released', children=list(
-            htmlDiv(list(
-                htmlH1('Game Dashboard R deployment'),
-                htmlBr(),
-                dbcButton("Reset Filters",
-                          id="reset_button"),
-                htmlBr(),
-                htmlLabel("Plot 1: Copies Sold vs Time"),
-                dccGraph(id='plot-area'),
-                htmlBr(),
-                htmlLabel("Plot 2: Number of Games Released vs Time"),
-                dccGraph(id='plot-area2'),
-                htmlBr(),
-                htmlLabel("Plot 3: Number of Platforms, Genres and Publishers with games selling over 100,000 copies."),
-                dccGraph(id='plot-area3'),
-                htmlBr(),
-                htmlLabel("Select your region of interest:"),
-                dccDropdown(
-                    id='region_selector',
-                    options = list(list(label="North America",value="NA_Sales"),
-                                   list(label="Europe",value="EU_Sales"),
-                                   list(label="Japan",value="JP_Sales"),
-                                   list(label="Other",value="Other_Sales"),
-                                   list(label="Global", value = "Global_Sales")),
-                    value='Global_Sales',
-                    multi=TRUE),
-                htmlBr(),
-                htmlLabel("Select your Platform of interest:"),
-                dccDropdown(
-                    id='platform_selector',
-                    options = platform_filter,
-                    value="all",
-                    multi=TRUE),
-                htmlBr(),
-                htmlLabel("Select your Genre of interest:"),
-                dccDropdown(
-                    id='genre_selector',
-                    options = genre_filter,
-                    value="all",
-                    multi=TRUE),
-                htmlBr(),
-                htmlLabel("Select your Publisher of interest:"),
-                dccDropdown(
-                    id='publisher_selector',
-                    options = publisher_filter,
-                    value="all",
-                    multi=TRUE),
-                htmlBr(),
-                htmlLabel('Slider'),
-                dccRangeSlider(
-                    id = "year_selector",
-                    min = 1980,
-                    max = 2017,
-                    marks = list("1980" = "1980",
-                                 "1985" = "1985",
-                                 "1990" = "1990",
-                                 "1995" = "1995",
-                                 "2000" = "2000",
-                                 "2005" = "2005",
-                                 "2010" = "2010",
-                                 "2015" = "2015"),
-                    value = list(1980,2017))
-            ))
-        )),
-        dccTab(label='Number of copies sold', children=list(
-            htmlDiv(list(
-                # htmlH1('AAMIR DATA'),
-                htmlLabel("Plot 4: Copies Sold vs Genre"),
-                dccGraph(id='plot-area4'),
-                htmlBr(),
-                htmlLabel("Select your region of interest:"),
-                dccDropdown(
-                    id='region_selector2',
-                    options = list(list(label="North America",value="NA_Sales"),
-                                   list(label="Europe",value="EU_Sales"),
-                                   list(label="Japan",value="JP_Sales"),
-                                   list(label="Other",value="Other_Sales"),
-                                   list(label="Global", value = "Global_Sales")),
-                    value='Global_Sales',
-                    multi=FALSE)
-            ))
-        )),
-        dccTab(label='Top Game titles, Platforms and Publishers across Genres', children=list(
-            htmlDiv(list(
-                # Plot 5 DATA SLOW ONE
-                htmlLabel("Plot 5: Top Choice vs Genre"),
-                dccGraph(id='plot-area5'),
-                htmlBr(),
-                htmlLabel("Select your choice of interest:"),
-                dccDropdown(
-                    id='popular_selector',
-                    options = list(list(label="Game Title",value="Game_Title"),
-                                   list(label="Publisher",value="Publisher"),
-                                   list(label="Platform",value="Platform")),
-                    value='Game_Title',
-                    multi=FALSE),
-                htmlBr(),
-                htmlBr(),
-                # Top Score Cards
-                dbcContainer(list(
-                    dbcRow(list(
-                        dbcCol(list(
-                            dbcCard(list(
-                                dbcCardHeader("Game with most copies sold:"),
-                                dbcCardBody(list(
-                                    htmlH5(id="top_game",
-                                           top_game_init$Name),
-                                    htmlP(id="top_game_sales",
-                                          sprintf("%.2f million copies sold",top_game_init$`Copies Sold`))
-                                ))
-                            ),
-                            color="primary",
-                            inverse=TRUE
-                            ),
-                            dbcCard(list(
-                                dbcCardHeader("Genre with Most Copies Sold"),
-                                dbcCardBody(list(
-                                    htmlH5(id="top_genre",
-                                           top_genre_init$Genre),
-                                    htmlP(id="top_genre_sales",
-                                          sprintf("%.2f million copies sold",top_genre_init$`Copies Sold`))
-                                ))
-                            ),
-                            color="secondary",
-                            inverse=TRUE
-                            ),
-                            dbcCard(list(
-                                dbcCardHeader("Platform with Most Copies Sold"),
-                                dbcCardBody(list(
-                                    htmlH5(id="top_platform",
-                                           top_platform_init$Platform),
-                                    htmlP(id="top_platform_sales",
-                                          sprintf("%.2f million copies sold",top_platform_init$`Copies Sold`))
-                                ))
-                            ),
-                            color="info",
-                            inverse=TRUE
-                            ),
-                            dbcCard(list(
-                                dbcCardHeader("Publisher with Most Copies Sold"),
-                                dbcCardBody(list(
-                                    htmlH5(id="top_publisher",
-                                           top_publisher_init$Publisher),
-                                    htmlP(id="top_publisher_sales",
-                                          sprintf("%.2f million copies sold",top_publisher_init$`Copies Sold`))
-                                ))
-                            ),
-                            color="success",
-                            inverse=TRUE
-                            )
-                        ),width=3),
-                        dbcCol(list(
-                            dbcCard(
-                                dbcCardBody(list(
-                                    htmlH1("Top Game is:"),
-                                    htmlP("Answer"),
-                                    htmlP("# of Sales")
-                                ))
-                            )    
+## Dropdown modules
+
+dropdown_region = dccDropdown(id='region_selector',
+                              options = list(list(label="North America",value="NA_Sales"),
+                                             list(label="Europe",value="EU_Sales"),
+                                             list(label="Japan",value="JP_Sales"),
+                                             list(label="Other",value="Other_Sales"),
+                                             list(label="Global", value = "Global_Sales")),
+                              value='Global_Sales',
+                              multi=TRUE)
+
+dropdown_region_2 = dccDropdown(
+    id='region_selector2',
+    options = list(list(label="North America",value="NA_Sales"),
+                   list(label="Europe",value="EU_Sales"),
+                   list(label="Japan",value="JP_Sales"),
+                   list(label="Other",value="Other_Sales"),
+                   list(label="Global", value = "Global_Sales")),
+    value='Global_Sales',
+    multi=FALSE)
+
+dropdown_platform = dccDropdown(id='platform_selector',options = platform_filter,value="all",multi=TRUE)
+
+dropdown_genre = dccDropdown(id='genre_selector',options = genre_filter,value="all",multi=TRUE)
+
+dropdown_publisher = dccDropdown(id='publisher_selector',options = publisher_filter,value="all",multi=TRUE)
+
+dropdown_gamechoice = dccDropdown(id='popular_selector',
+                                  options = list(list(label="Game Title",value="Game_Title"),
+                                                 list(label="Publisher",value="Publisher"),
+                                                 list(label="Platform",value="Platform")),
+                                  value='Game_Title',
+                                  multi=FALSE)
+
+# Range slider modules
+
+range_slider_timeseries = dccRangeSlider(id = "year_selector",
+                                         min = 1980,
+                                         max = 2017,
+                                         marks = list("1980" = "1980",
+                                                      "1985" = "1985",
+                                                      "1990" = "1990",
+                                                      "1995" = "1995",
+                                                      "2000" = "2000",
+                                                      "2005" = "2005",
+                                                      "2010" = "2010",
+                                                      "2015" = "2015"),
+                                         value = list(1980,2017))
+
+
+clearing_filters_button = dbcButton("Reset Filters",id="reset_button")
+
+
+# Tab modules
+tab1_components = 
+    htmlDiv(list(
+        htmlBr(),
+        htmlLabel("Plot 2: Number of Games Released vs Time"),
+        dccGraph(id='plot-area2'),
+        htmlBr(),
+        htmlLabel("Plot 3: Number of Platforms, Genres and Publishers with games selling over 100,000 copies."),
+        dccGraph(id='plot-area3')
+    ))
+
+first_tab_sidebar_Card = dbcCard(
+    dbcCardBody(htmlDiv(
+        list(htmlH4("Dashboard for Video Games Statistics")
+        )
+    ))
+)
+
+first_tab_sidebar_Card_2 = dbcCard(
+    dbcCardBody(htmlDiv(
+        list(clearing_filters_button,htmlBr(),htmlBr(),
+             htmlLabel("Select your region of interest:"),
+             dropdown_region,
+             htmlBr(),
+             htmlLabel("Select your Platform of interest:"),
+             dropdown_platform,
+             htmlBr(),
+             htmlLabel("Select your Genre of interest:"),
+             dropdown_genre,
+             htmlBr(),
+             htmlLabel("Select your Publisher of interest:"),
+             dropdown_publisher,
+             htmlBr(),
+             htmlLabel('Time Range'),
+             range_slider_timeseries
+             
+        )
+    ))
+)
+
+
+
+
+first_tab_figures_card = dbcCard(
+    dbcCardBody(htmlDiv(list(tab1_components))))
+
+
+row_tab1 = dbcRow(list(
+    dbcCol(first_tab_sidebar_Card, width = 3),
+    dbcCol(first_tab_figures_card), width = 9))
+
+
+tab_1 = dccTab(label='Number of games released',children=list(first_tab_figures_card))
+
+
+
+tab_2 = dccTab(label='Number of copies sold', children=list(
+    htmlDiv(list(
+        # htmlH1('AAMIR DATA'),
+        htmlLabel("Plot 1: Copies Sold vs Time"),
+        dccGraph(id='plot-area'),
+        htmlBr(),
+        htmlLabel("Plot 4: Copies Sold vs Genre"),
+        dccGraph(id='plot-area4'),
+        htmlBr(),
+        htmlLabel("Select your region of interest:"),
+        dropdown_region_2
+    ))
+))
+
+tab_3 = dccTab(label='Top Game titles, Platforms and Publishers across Genres', children=list(
+    htmlDiv(list(
+        # Plot 5 DATA SLOW ONE
+        htmlLabel("Plot 5: Top Choice vs Genre"),
+        htmlBr(),
+        htmlLabel("Select your choice of interest:"),
+        dropdown_gamechoice,
+        dccGraph(id='plot-area5'),
+        htmlBr(),
+        htmlBr(),
+        # Top Score Cards
+        dbcContainer(list(
+            dbcRow(list(
+                dbcCol(list(
+                    dbcCard(list(
+                        dbcCardHeader("Game with most copies sold:"),
+                        dbcCardBody(list(
+                            htmlH5(id="top_game",
+                                   top_game_init$Name),
+                            htmlP(id="top_game_sales",
+                                  sprintf("%.2f million copies sold",top_game_init$`Copies Sold`))
                         ))
-                    ))
+                    ),
+                    color="primary",
+                    inverse=TRUE
+                    ),
+                    dbcCard(list(
+                        dbcCardHeader("Genre with Most Copies Sold"),
+                        dbcCardBody(list(
+                            htmlH5(id="top_genre",
+                                   top_genre_init$Genre),
+                            htmlP(id="top_genre_sales",
+                                  sprintf("%.2f million copies sold",top_genre_init$`Copies Sold`))
+                        ))
+                    ),
+                    color="secondary",
+                    inverse=TRUE
+                    ),
+                    dbcCard(list(
+                        dbcCardHeader("Platform with Most Copies Sold"),
+                        dbcCardBody(list(
+                            htmlH5(id="top_platform",
+                                   top_platform_init$Platform),
+                            htmlP(id="top_platform_sales",
+                                  sprintf("%.2f million copies sold",top_platform_init$`Copies Sold`))
+                        ))
+                    ),
+                    color="info",
+                    inverse=TRUE
+                    ),
+                    dbcCard(list(
+                        dbcCardHeader("Publisher with Most Copies Sold"),
+                        dbcCardBody(list(
+                            htmlH5(id="top_publisher",
+                                   top_publisher_init$Publisher),
+                            htmlP(id="top_publisher_sales",
+                                  sprintf("%.2f million copies sold",top_publisher_init$`Copies Sold`))
+                        ))
+                    ),
+                    color="success",
+                    inverse=TRUE
+                    )
+                ),width=3),
+                dbcCol(list(
+                    dbcCard(
+                        dbcCardBody(list(
+                            htmlH1("Top Game is:"),
+                            htmlP("Answer"),
+                            htmlP("# of Sales")
+                        ))
+                    )    
                 ))
             ))
         ))
     ))
+))
+
+app$layout(dbcRow(list(
+    dbcCol(list(
+        htmlDiv(list(first_tab_sidebar_Card, htmlBr(), first_tab_sidebar_Card_2, htmlBr()))),width = 3),
+    dbcCol(dbcContainer(
+        (htmlDiv(htmlDiv(list(
+            dccTabs(id="tabs", children=list(
+                tab_1,tab_2,tab_3
+            ))
+        ))
+        ))), width = 9)
+    
 )))
+
+
+
 
 #Callback for Button
 app$callback(
@@ -288,26 +337,25 @@ app$callback(
         min_year = years[1]
         max_year = years[2]
         
-        top_game <- game_melt %>% 
-            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+        filtered_subset <- game_melt %>% 
+            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year)
+        
+        top_game <-  filtered_subset %>%
             group_by(Name) %>%
             summarise("Copies Sold" = sum(`Copies Sold`)) %>%
             subset(`Copies Sold`== max(`Copies Sold`))
         
-        top_genre <- game_melt %>% 
-            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+        top_genre <- filtered_subset %>%
             group_by(Genre) %>%
             summarise("Copies Sold" = sum(`Copies Sold`)) %>%
             subset(`Copies Sold`== max(`Copies Sold`))
         
-        top_publisher <- game_melt %>% 
-            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+        top_publisher <- filtered_subset %>%
             group_by(Publisher) %>%
             summarise("Copies Sold" = sum(`Copies Sold`)) %>%
             subset(`Copies Sold`== max(`Copies Sold`))
         
-        top_platform <- game_melt %>% 
-            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+        top_platform <- filtered_subset %>%
             group_by(Platform) %>%
             summarise("Copies Sold" = sum(`Copies Sold`)) %>%
             subset(`Copies Sold`== max(`Copies Sold`))
@@ -320,6 +368,11 @@ app$callback(
 )
 
 #Callback for all plots
+
+
+
+
+
 app$callback(
     list(output('plot-area', 'figure'),
          output('plot-area2', 'figure'),
@@ -359,8 +412,10 @@ app$callback(
         min_year = years[1]
         max_year = years[2]
         
-        graph1 <- game_melt[,3:8] %>% 
-            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+        filtered_game_melt <- game_melt[,3:8] %>% 
+            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year)
+        
+        graph1 <-  filtered_game_melt %>%
             group_by(Year,Genre) %>%
             summarise("Copies Sold" = sum(`Copies Sold`)) %>% 
             ggplot() +
@@ -372,12 +427,13 @@ app$callback(
                              "<br>Genre: ", Genre)) + 
             geom_bar(stat="identity")+
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2)) +
+            scale_color_brewer(palette = "PuOr") +
+            #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Copies Sold (in millions)")+
             xlab("Year")
         graph1 <- ggplotly(graph1,tooltip="text")
-
-        graph2 <- game_melt[,3:8] %>% 
-            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
+        
+        graph2 <- filtered_game_melt %>%
             group_by(Year,Genre) %>%
             count(Year,Genre) %>%
             rename(`Number of Releases`="n") %>% 
@@ -390,13 +446,12 @@ app$callback(
                              "<br>Genre: ", Genre)) + 
             geom_bar(stat="identity") +
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
+            #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Games Released")+
             xlab("Year")
         graph2<-ggplotly(graph2,tooltip="text")
-
-        graph3 <- game_melt[,3:8] %>% 
-            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year) %>%
-            group_by(Year)%>%
+        
+        graph3 <- filtered_game_melt %>%
             melt(id.vars=c("Year"),measure.vars=c("Genre","Platform","Publisher")) %>%
             rename(Category='variable') %>% 
             group_by(Year,Category) %>%
@@ -412,6 +467,7 @@ app$callback(
                              "<br>Category: ", Category)) + 
             geom_bar(stat="identity")+
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
+            #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Counts of Sucessful Genres, Publishers and Platforms")+
             xlab("Year")
         graph3<-ggplotly(graph3,tooltip="text")
@@ -419,6 +475,10 @@ app$callback(
         return(list(graph1,graph2,graph3))
     }
 )
+
+#Callback for linking time sliders
+
+
 
 #Callback for Plot4
 app$callback(
@@ -442,6 +502,7 @@ app$callback(
                 y=genre_sales) + 
             geom_bar(stat="identity", fill='darkblue') +
             theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
+            #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Copies Sold (in millions)") +
             xlab("Genre")
         
@@ -467,6 +528,7 @@ app$callback(
                 geom_point() +
                 geom_text(aes(label=ifelse(`Copies Sold`>max(`Copies Sold`)*0.35,as.character(Name),'')),hjust=-0.1, vjust=0) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
+                #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
         } else if (plot_type == "Publisher") {
@@ -478,6 +540,7 @@ app$callback(
                 geom_point() +
                 geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Publisher),'')),hjust=-0.1, vjust=0) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
+                #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
         } else if (plot_type == "Platform") {
@@ -488,13 +551,14 @@ app$callback(
                 aes(x=reorder(Genre,-net_sales), y=net_sales) +
                 geom_point() +
                 geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Platform),'')),hjust=-0.1, vjust=0) +
+                #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
         }
-
+        
         return (ggplotly(graph4))
     }
 )
 
-app$run_server(host = '127.0.0.1')
+app$run_server(host = '0.0.0.0')

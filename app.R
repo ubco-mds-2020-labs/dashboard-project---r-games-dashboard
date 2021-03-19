@@ -111,19 +111,6 @@ range_slider_timeseries = dccRangeSlider(id = "year_selector",
                                                       "2015" = "2015"),
                                          value = list(1980,2017))
 
-range_slider_timeseries_2 = dccRangeSlider(id = "year_selector_2",
-                                         min = 1980,
-                                         max = 2017,
-                                         marks = list("1980" = "1980",
-                                                      "1985" = "1985",
-                                                      "1990" = "1990",
-                                                      "1995" = "1995",
-                                                      "2000" = "2000",
-                                                      "2005" = "2005",
-                                                      "2010" = "2010",
-                                                      "2015" = "2015"),
-                                         value = list(1980,2017))
-
 
 clearing_filters_button = dbcButton("Reset Filters",id="reset_button")
 
@@ -131,9 +118,6 @@ clearing_filters_button = dbcButton("Reset Filters",id="reset_button")
 # Tab modules
 tab1_components = 
     htmlDiv(list(
-        htmlBr(),
-        htmlLabel('Time Range'),
-        range_slider_timeseries,
         htmlBr(),
         htmlLabel("Plot 2: Number of Games Released vs Time"),
         dccGraph(id='plot-area2'),
@@ -162,7 +146,10 @@ first_tab_sidebar_Card_2 = dbcCard(
              dropdown_genre,
              htmlBr(),
              htmlLabel("Select your Publisher of interest:"),
-             dropdown_publisher
+             dropdown_publisher,
+             htmlBr(),
+             htmlLabel('Time Range'),
+             range_slider_timeseries
              
         )
     ))
@@ -440,6 +427,8 @@ app$callback(
                              "<br>Genre: ", Genre)) + 
             geom_bar(stat="identity")+
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2)) +
+            scale_color_brewer(palette = "PuOr") +
+            #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Copies Sold (in millions)")+
             xlab("Year")
         graph1 <- ggplotly(graph1,tooltip="text")
@@ -457,6 +446,7 @@ app$callback(
                              "<br>Genre: ", Genre)) + 
             geom_bar(stat="identity") +
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
+            #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Games Released")+
             xlab("Year")
         graph2<-ggplotly(graph2,tooltip="text")
@@ -477,6 +467,7 @@ app$callback(
                              "<br>Category: ", Category)) + 
             geom_bar(stat="identity")+
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
+            #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Counts of Sucessful Genres, Publishers and Platforms")+
             xlab("Year")
         graph3<-ggplotly(graph3,tooltip="text")
@@ -511,6 +502,7 @@ app$callback(
                 y=genre_sales) + 
             geom_bar(stat="identity", fill='darkblue') +
             theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
+            #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Copies Sold (in millions)") +
             xlab("Genre")
         
@@ -536,6 +528,7 @@ app$callback(
                 geom_point() +
                 geom_text(aes(label=ifelse(`Copies Sold`>max(`Copies Sold`)*0.35,as.character(Name),'')),hjust=-0.1, vjust=0) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
+                #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
         } else if (plot_type == "Publisher") {
@@ -547,6 +540,7 @@ app$callback(
                 geom_point() +
                 geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Publisher),'')),hjust=-0.1, vjust=0) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
+                #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
         } else if (plot_type == "Platform") {
@@ -557,6 +551,7 @@ app$callback(
                 aes(x=reorder(Genre,-net_sales), y=net_sales) +
                 geom_point() +
                 geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Platform),'')),hjust=-0.1, vjust=0) +
+                #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")

@@ -596,42 +596,61 @@ app$callback(
 
 
 
-#Callback for Plot4
+#Callback for Tab2-Plot2
 app$callback(
     output('plot-area4', 'figure'),
-    list(input('region_selector2', 'value')),
-    function(reg) {
-        # Input: List of Regions
-        # Output: Graph
+    list(input('region_selector', 'value'),
+         input('platform_selector', 'value'),
+         input('genre_selector', 'value'),
+         input('publisher_selector', 'value'),
+         input('year_selector', 'value')),
+    function(reg,plat,gen,pub,years) {
+        #Input: List of Regions, Platforms, Genres, Publishers, Min and Max Year
+        #Output: Name & Sales of Top Game
         #
         if ("Global_Sales" %in% reg){
-            region_filter = list("NA_Sales", "EU_Sales", "JP_Sales", "Other_Sales")
+            filter_region = list("Global_Sales")
         } else {
-            region_filter = reg
+            filter_region = reg
         }
-        graph4 <- sales_data[,3:8] %>% 
-            subset(Region %in% region_filter) %>%
+        if ("all" %in% plat){
+            filter_plat = unique(game_melt$Platform)
+        } else {
+            filter_plat = plat
+        }
+        if ("all" %in% gen){
+            filter_gen = unique(game_melt$Genre)
+        } else {
+            filter_gen = gen
+        }
+        if ("all" %in% pub){
+            filter_pub = unique(game_melt$Publisher)
+        } else {
+            filter_pub = pub
+        }
+        min_year = years[1]
+        max_year = years[2]
+        
+        filtered_subset <- game_melt %>% 
+            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year)
+        
+        graph3 <- filtered_subset %>%
             group_by(Genre) %>%
             summarize(genre_sales = sum(Copies_Sold)) %>%
             ggplot() +
             aes(x=reorder(Genre,-genre_sales),
                 y=genre_sales,
-                fill = Genre) + 
-            geom_bar(stat="identity") +
-            theme_bw() +
-            theme(legend.title=element_blank()) +
-            theme(legend.position = "none") +
-            theme(panel.grid.major.x = element_blank()) + 
-            theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
+                fill=Genre) + 
+            geom_bar(stat="identity") + 
             #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Copies Sold (in millions)") +
             xlab("Genre")
         
-        return (ggplotly(graph4))
+        return (ggplotly(graph3))
     }
 )
 
-#Callback for Plot5
+#Callback for Tab3-Plot1
 app$callback(
     output('plot-area5', 'figure'),
     list(input('popular_selector', 'value')),

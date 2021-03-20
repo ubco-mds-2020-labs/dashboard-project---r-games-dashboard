@@ -27,6 +27,7 @@ graph1 <- game_melt %>%
         y=`Copies Sold`,
         fill = Genre) + 
     geom_bar(stat="identity")+
+    theme_bw()+
     theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2)) +
     ylab("Number of Copies Sold (in millions)")
     
@@ -45,6 +46,8 @@ graph2 <- game_melt %>%
         y=`Number of Releases`,
         fill = Genre) + 
     geom_bar(stat="identity")+
+    theme_bw()+
+    theme(panel.grid.major.x = element_blank())+
     theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
     ylab("Number of Games Released")
 ggplotly(graph2)
@@ -159,6 +162,7 @@ testfxc2 <-function(reg,plat,gen,pub,years) {
                 y=`Number of Releases`,
                 fill = Genre) + 
             geom_bar(stat="identity")+
+            theme_bw()+
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
             ylab("Number of Games Released")
 
@@ -192,12 +196,21 @@ x <- filtered_game_melt %>%
                              "<br>No. of Succesful Gen, Publ, Plat: ",`Counts of Genres, Publishers and Platforms`,
                              "<br>Category: ", Category)) + 
             geom_bar(stat="identity")+
+            theme(legend.title=element_blank())+
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
             ylab("Counts of Sucessful Genres, Publishers and Platforms")+
             xlab("Year")
 ggplotly(x,tooltip="text")
 ```
-
+```{r}
+test <- 1
+if (test %% 2 == 0){
+    print("Close")
+} else {
+    print(!FALSE)
+}
+state(FALSE)
+```
 
 
 

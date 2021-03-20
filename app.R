@@ -114,15 +114,71 @@ range_slider_timeseries = dccRangeSlider(id = "year_selector",
 
 clearing_filters_button = dbcButton("Reset Filters",id="reset_button")
 
+#  Collapse buttons
+tab1_htu <- htmlDiv(list(
+    dbcButton("How to use:",
+              id="tab1-button",
+              className="mb-3",
+              color="primary"),
+    dbcCollapse(
+        id = "tab1-collapse",
+        is_open = TRUE,
+        dbcCard(list(
+            dbcCardBody(list(
+                htmlP("- Change the filters on sidebar to desired fields."),
+                htmlP("- Use the `Reset Filters` button to return to default values."),
+                htmlP("- Plots will change with the filters on the sidebar.")
+            ))
+        ))
+    )
+))
+
+tab2_htu <- htmlDiv(list(
+    dbcButton("How to use:",
+              id="tab2-button",
+              className="mb-3",
+              color="primary"),
+    dbcCollapse(
+        id = "tab2-collapse",
+        is_open = TRUE,
+        dbcCard(list(
+            dbcCardBody(list(
+                htmlP("- Change the filters on sidebar to desired fields."),
+                htmlP("- Use the `Reset Filters` button to return to default values."),
+                htmlP("- Plots will change with the filters on the sidebar.")
+            ))
+        ))
+    )
+))
+
+tab3_htu <- htmlDiv(list(
+    dbcButton("How to use:",
+              id="tab3-button",
+              className="mb-3",
+              color="primary"),
+    dbcCollapse(
+        id = "tab3-collapse",
+        is_open = TRUE,
+        dbcCard(list(
+            dbcCardBody(list(
+                htmlP("- Change the filters on sidebar to desired fields."),
+                htmlP("- Both cards and plots will change with the filters on the sidebar."),
+                htmlP("- Use the `Reset Filters` button to return to default values."),
+                htmlP("- Use the dropdown to change the category of interest for the plot.")
+            ))
+        ))
+    )
+))
+
 
 # Tab modules
 tab1_components = 
     htmlDiv(list(
         htmlBr(),
-        htmlLabel("Plot 2: Number of Games Released vs Time"),
+        htmlH3("Number of Games Released over Time"),
         dccGraph(id='plot-area2'),
         htmlBr(),
-        htmlLabel("Plot 3: Number of Platforms, Genres and Publishers with games selling over 100,000 copies."),
+        htmlH3("Number of Genres, Platforms and Publishers with Games selling over 100,000 copies"),
         dccGraph(id='plot-area3')
     ))
 
@@ -167,33 +223,51 @@ row_tab1 = dbcRow(list(
     dbcCol(first_tab_figures_card), width = 9))
 
 
-tab_1 = dccTab(label='Number of games released',children=list(first_tab_figures_card))
+tab_1 = dccTab(label='Number of Games Released',children=list(
+    dbcCard(list(
+        dbcCardBody(list(
+            htmlP("This tab contains information regarding the trend of game releases across Genres, Platforms and Publishers."),
+            tab1_htu
+        ))
+    )),
+    htmlBr(),
+    first_tab_figures_card))
 
 
 
-tab_2 = dccTab(label='Number of copies sold', children=list(
+tab_2 = dccTab(label='Number of Copies Sold', children=list(
     htmlDiv(list(
-        # htmlH1('AAMIR DATA'),
-        htmlLabel("Plot 1: Copies Sold vs Time"),
-        dccGraph(id='plot-area'),
+        dbcCard(list(
+            dbcCardBody(list(
+                htmlP("This tab contains regarding the number of copies sold across Genres, Platforms and Publishers."),
+                tab2_htu
+            ))
+        )),
         htmlBr(),
-        htmlLabel("Plot 4: Copies Sold vs Genre"),
-        dccGraph(id='plot-area4'),
-        htmlBr(),
-        htmlLabel("Select your region of interest:"),
-        dropdown_region_2
+        dbcCard(list(
+            dbcCardBody(list(
+                htmlH3("Number of Copies Sold over time"),
+                dccGraph(id='plot-area'),
+                htmlBr(),
+                htmlH3("Total Number of Copies Sold by Genre"),
+                dccGraph(id='plot-area4'),
+                htmlBr(),
+                htmlLabel("Select your region of interest:"),
+                dropdown_region_2
+            ))
+        ))
     ))
 ))
 
-tab_3 = dccTab(label='Top Game titles, Platforms, Publishers and Genres', children=list(
+tab_3 = dccTab(label='Top Copies Sold', children=list(
+    #Information at the Top
     htmlDiv(list(
-        # Plot 5 DATA SLOW ONE
-        htmlLabel("Plot 5: Top Choice vs Genre"),
-        htmlBr(),
-        htmlLabel("Select your choice of interest:"),
-        dropdown_gamechoice,
-        dccGraph(id='plot-area5'),
-        htmlBr(),
+        dbcCard(list(
+            dbcCardBody(list(
+                htmlP("This tab contains information about the top Games, Genres, Platforms and Publishers in terms of copies sold."),
+                tab3_htu
+            ))
+        )),
         htmlBr(),
         # Top Score Cards
         dbcContainer(list(
@@ -211,6 +285,7 @@ tab_3 = dccTab(label='Top Game titles, Platforms, Publishers and Genres', childr
                     color="primary",
                     inverse=TRUE
                     ),
+                    htmlBr(),
                     dbcCard(list(
                         dbcCardHeader("Genre with Most Copies Sold"),
                         dbcCardBody(list(
@@ -223,6 +298,7 @@ tab_3 = dccTab(label='Top Game titles, Platforms, Publishers and Genres', childr
                     color="secondary",
                     inverse=TRUE
                     ),
+                    htmlBr(),
                     dbcCard(list(
                         dbcCardHeader("Platform with Most Copies Sold"),
                         dbcCardBody(list(
@@ -235,6 +311,7 @@ tab_3 = dccTab(label='Top Game titles, Platforms, Publishers and Genres', childr
                     color="info",
                     inverse=TRUE
                     ),
+                    htmlBr(),
                     dbcCard(list(
                         dbcCardHeader("Publisher with Most Copies Sold"),
                         dbcCardBody(list(
@@ -248,12 +325,16 @@ tab_3 = dccTab(label='Top Game titles, Platforms, Publishers and Genres', childr
                     inverse=TRUE
                     )
                 ),width=3),
+                #Graph
                 dbcCol(list(
                     dbcCard(
                         dbcCardBody(list(
-                            htmlH1("Top Game is:"),
-                            htmlP("Answer"),
-                            htmlP("# of Sales")
+                            htmlH3("Top XX observations by Genre"),
+                            htmlBr(),
+                            htmlLabel("Select your choice of interest:"),
+                            dropdown_gamechoice,
+                            dccGraph(id='plot-area5'),
+                            htmlBr()
                         ))
                     )    
                 ))
@@ -274,9 +355,6 @@ app$layout(dbcRow(list(
         ))), width = 9)
 )))
 
-
-
-
 #Callback for Button
 app$callback(
     list(output('region_selector', 'value'),
@@ -291,6 +369,43 @@ app$callback(
         #
         #If clicked - return default values to filters
         return (list("Global_Sales","all","all","all",list(1980,2017)))
+    }
+)
+
+#Callback for HTU button - Tab 1
+app$callback(
+    list(output("tab1-collapse","is_open")),
+    list(input("tab1-button","n_clicks"),
+         state("tab1-collapse","is_open")),
+    function (n_clicks,is_open){
+        #Input: Button and State of Collapse
+        #Output: Opposite of Current State of Collapse
+        return (list(!is_open))
+    }
+)
+
+#Callback for HTU button - Tab 2
+app$callback(
+    list(output("tab2-collapse","is_open")),
+    list(input("tab2-button","n_clicks"),
+         state("tab2-collapse","is_open")),
+    function (n_clicks,is_open){
+        #Input: Button and State of Collapse
+        #Output: Opposite of Current State of Collapse
+        return (list(!is_open))
+    }
+)
+
+
+#Callback for HTU button - Tab 3
+app$callback(
+    list(output("tab3-collapse","is_open")),
+    list(input("tab3-button","n_clicks"),
+         state("tab3-collapse","is_open")),
+    function (n_clicks,is_open){
+        #Input: Button and State of Collapse
+        #Output: Opposite of Current State of Collapse
+        return (list(!is_open))
     }
 )
 
@@ -367,11 +482,6 @@ app$callback(
 )
 
 #Callback for all plots
-
-
-
-
-
 app$callback(
     list(output('plot-area', 'figure'),
          output('plot-area2', 'figure'),
@@ -425,6 +535,9 @@ app$callback(
                              "<br>Copies Sold: ",`Copies Sold`,
                              "<br>Genre: ", Genre)) + 
             geom_bar(stat="identity")+
+            theme_bw() +
+            theme(legend.title=element_blank()) +
+            theme(panel.grid.major.x = element_blank()) + 
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2)) +
             #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Copies Sold (in millions)")+
@@ -443,6 +556,8 @@ app$callback(
                              "<br>No. of Games Released: ",`Number of Releases`,
                              "<br>Genre: ", Genre)) + 
             geom_bar(stat="identity") +
+            theme_bw() +
+            theme(panel.grid.major.x = element_blank()) + 
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
             #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Games Released")+
@@ -464,6 +579,9 @@ app$callback(
                              "<br>No. of Succesful Gen, Publ, Plat: ",`Counts of Genres, Publishers and Platforms`,
                              "<br>Category: ", Category)) + 
             geom_bar(stat="identity")+
+            theme_bw() +
+            theme(legend.title=element_blank()) +
+            theme(panel.grid.major.x = element_blank()) + 
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
             #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Counts of Sucessful Genres, Publishers and Platforms")+
@@ -491,20 +609,25 @@ app$callback(
         } else {
             region_filter = reg
         }
-        graph3 <- sales_data[,3:8] %>% 
+        graph4 <- sales_data[,3:8] %>% 
             subset(Region %in% region_filter) %>%
             group_by(Genre) %>%
             summarize(genre_sales = sum(Copies_Sold)) %>%
             ggplot() +
             aes(x=reorder(Genre,-genre_sales),
-                y=genre_sales) + 
-            geom_bar(stat="identity", fill='darkblue') +
+                y=genre_sales,
+                fill = Genre) + 
+            geom_bar(stat="identity") +
+            theme_bw() +
+            theme(legend.title=element_blank()) +
+            theme(legend.position = "none") +
+            theme(panel.grid.major.x = element_blank()) + 
             theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
             #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Copies Sold (in millions)") +
             xlab("Genre")
         
-        return (ggplotly(graph3))
+        return (ggplotly(graph4))
     }
 )
 
@@ -525,6 +648,9 @@ app$callback(
                 aes(x=reorder(Genre,-Copies_Sold), y=Copies_Sold) +
                 geom_point() +
                 geom_text(aes(label=ifelse(Copies_Sold>max(Copies_Sold)*0.35,as.character(Name),'')),hjust=-0.1, vjust=0) +
+                theme_bw() +
+                theme(legend.title=element_blank()) +
+                theme(panel.grid.major.x = element_blank()) + 
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
                 #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 ylab("Number of Copies Sold (in millions)") +
@@ -535,6 +661,8 @@ app$callback(
                 summarise(net_sales = sum(Copies_Sold), `.groups` = 'keep') %>%
                 ggplot() +
                 aes(x=reorder(Genre,-net_sales), y=net_sales) +
+                theme_bw() +
+                theme(panel.grid.major.x = element_blank()) + 
                 geom_point() +
                 geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Publisher),'')),hjust=-0.1, vjust=0) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
@@ -547,6 +675,9 @@ app$callback(
                 summarise(net_sales = sum(Copies_Sold), `.groups` = 'keep') %>%
                 ggplot() +
                 aes(x=reorder(Genre,-net_sales), y=net_sales) +
+                theme_bw() +
+                theme(legend.title=element_blank()) +
+                theme(panel.grid.major.x = element_blank()) + 
                 geom_point() +
                 geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Platform),'')),hjust=-0.1, vjust=0) +
                 #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
@@ -559,5 +690,5 @@ app$callback(
     }
 )
 
-app$run_server(host = '0.0.0.0')
-#app$run_server(debug=T)
+#app$run_server(host = '0.0.0.0')
+app$run_server(debug=T)

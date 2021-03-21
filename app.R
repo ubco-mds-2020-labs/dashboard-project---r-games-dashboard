@@ -557,6 +557,7 @@ app$callback(
                              "<br>Genre: ", Genre)) + 
             geom_bar(stat="identity") +
             theme_bw() +
+            theme(legend.title=element_blank()) +
             theme(panel.grid.major.x = element_blank()) + 
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
             #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
@@ -641,7 +642,10 @@ app$callback(
             aes(x=reorder(Genre,-genre_sales),
                 y=genre_sales,
                 fill=Genre) + 
-            geom_bar(stat="identity") + 
+            geom_bar(stat="identity") +
+            theme_bw() +
+            theme(panel.grid.major.x = element_blank()) + 
+            theme(legend.position="none")+
             #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Copies Sold (in millions)") +
             xlab("Genre")

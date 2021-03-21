@@ -239,7 +239,7 @@ tab_2 = dccTab(label='Number of Copies Sold', children=list(
     htmlDiv(list(
         dbcCard(list(
             dbcCardBody(list(
-                htmlP("This tab contains regarding the number of copies sold across Genres, Platforms and Publishers."),
+                htmlP("This tab contains information regarding the number of copies sold across Genres, Platforms and Publishers."),
                 tab2_htu
             ))
         )),
@@ -264,7 +264,7 @@ tab_3 = dccTab(label='Top Copies Sold', children=list(
     htmlDiv(list(
         dbcCard(list(
             dbcCardBody(list(
-                htmlP("This tab contains information about the top Games, Genres, Platforms and Publishers in terms of copies sold."),
+                htmlP("This tab contains information regarding top Games, Genres, Platforms and Publishers in terms of copies sold."),
                 tab3_htu
             ))
         )),

@@ -127,7 +127,9 @@ tab1_htu <- htmlDiv(list(
             dbcCardBody(list(
                 htmlP("- Change the filters on sidebar to desired fields."),
                 htmlP("- Use the `Reset Filters` button to return to default values."),
-                htmlP("- Plots will change with the filters on the sidebar.")
+                htmlP("- Plots will change with the filters on the sidebar."),
+                htmlP("- You can also filter the plots by clicking on their legends."),
+                htmlP("- If you put your mouse over any point in the plots, you will see a tooltip with further details.")
             ))
         ))
     )
@@ -145,7 +147,9 @@ tab2_htu <- htmlDiv(list(
             dbcCardBody(list(
                 htmlP("- Change the filters on sidebar to desired fields."),
                 htmlP("- Use the `Reset Filters` button to return to default values."),
-                htmlP("- Plots will change with the filters on the sidebar.")
+                htmlP("- Plots will change with the filters on the sidebar."),
+                htmlP("- You can also filter the plots by clicking on their legends."),
+                htmlP("- If you put your mouse over any point in the plots, you will see a tooltip with further details.")
             ))
         ))
     )
@@ -164,7 +168,8 @@ tab3_htu <- htmlDiv(list(
                 htmlP("- Change the filters on sidebar to desired fields."),
                 htmlP("- Both cards and plots will change with the filters on the sidebar."),
                 htmlP("- Use the `Reset Filters` button to return to default values."),
-                htmlP("- Use the dropdown to change the category of interest for the plot.")
+                htmlP("- Use the dropdown to change the category of interest for the plot."),
+                htmlP("- If you put your mouse over any point in the plots, you will see a tooltip with further details.")
             ))
         ))
     )
@@ -178,7 +183,7 @@ tab1_components =
         htmlH3("Number of Games Released over Time"),
         dccGraph(id='plot-area2'),
         htmlBr(),
-        htmlH3("Number of Genres, Platforms and Publishers with Games selling over 100,000 copies"),
+        htmlH3("Number of Genres, Platforms and Publishers with Games Selling Over 100,000 Copies"),
         dccGraph(id='plot-area3')
     ))
 
@@ -211,17 +216,8 @@ first_tab_sidebar_Card_2 = dbcCard(
     ))
 )
 
-
-
-
 first_tab_figures_card = dbcCard(
     dbcCardBody(htmlDiv(list(tab1_components))))
-
-
-row_tab1 = dbcRow(list(
-    dbcCol(first_tab_sidebar_Card, width = 3),
-    dbcCol(first_tab_figures_card), width = 9))
-
 
 tab_1 = dccTab(label='Number of Games Released',children=list(
     dbcCard(list(
@@ -236,7 +232,7 @@ tab_1 = dccTab(label='Number of Games Released',children=list(
 
 
 tab_2 = dccTab(label='Number of Copies Sold', children=list(
-    htmlDiv(list(
+    #htmlDiv(list(
         dbcCard(list(
             dbcCardBody(list(
                 htmlP("This tab contains information regarding the number of copies sold across Genres, Platforms and Publishers."),
@@ -246,17 +242,14 @@ tab_2 = dccTab(label='Number of Copies Sold', children=list(
         htmlBr(),
         dbcCard(list(
             dbcCardBody(list(
-                htmlH3("Number of Copies Sold over time"),
+                htmlH3("Number of Copies Sold Over Time"),
                 dccGraph(id='plot-area'),
                 htmlBr(),
                 htmlH3("Total Number of Copies Sold by Genre"),
-                dccGraph(id='plot-area4'),
-                htmlBr(),
-                htmlLabel("Select your region of interest:"),
-                dropdown_region_2
+                dccGraph(id='plot-area4')
             ))
         ))
-    ))
+    #))
 ))
 
 tab_3 = dccTab(label='Top Copies Sold', children=list(
@@ -324,7 +317,7 @@ tab_3 = dccTab(label='Top Copies Sold', children=list(
                     color="success",
                     inverse=TRUE
                     )
-                ),width=3),
+                ),width = 5),
                 #Graph
                 dbcCol(list(
                     dbcCard(
@@ -352,7 +345,7 @@ app$layout(dbcRow(list(
                 tab_1,tab_2,tab_3
             ))
         ))
-        ))), width = 9)
+        ))), width = 20)
 )))
 
 #Callback for Button
@@ -531,10 +524,11 @@ app$callback(
             aes(x=as.factor(Year),
                 y=`Copies Sold`,
                 fill = Genre,
+                group = 1,
                 text = paste("Year: ",as.factor(Year),
                              "<br>Copies Sold: ",`Copies Sold`,
                              "<br>Genre: ", Genre)) + 
-            geom_bar(stat="identity")+
+            geom_bar(stat="identity")+ #geom_line
             theme_bw() +
             theme(legend.title=element_blank()) +
             theme(panel.grid.major.x = element_blank()) + 
@@ -552,10 +546,11 @@ app$callback(
             aes(x=as.factor(Year),
                 y=`Number of Releases`,
                 fill = Genre,
+                group = 1,
                 text = paste("Year: ",as.factor(Year),
                              "<br>No. of Games Released: ",`Number of Releases`,
                              "<br>Genre: ", Genre)) + 
-            geom_bar(stat="identity") +
+            geom_bar(stat="identity") + #geom_line
             theme_bw() +
             theme(legend.title=element_blank()) +
             theme(panel.grid.major.x = element_blank()) + 
@@ -576,10 +571,11 @@ app$callback(
             aes(x=as.factor(Year),
                 y=`Counts of Genres, Publishers and Platforms`,
                 fill = Category,
+                group = 1,
                 text = paste("Year: ",as.factor(Year),
                              "<br>No. of Succesful Gen, Publ, Plat: ",`Counts of Genres, Publishers and Platforms`,
                              "<br>Category: ", Category)) + 
-            geom_bar(stat="identity")+
+            geom_area(stat="identity")+
             theme_bw() +
             theme(legend.title=element_blank()) +
             theme(panel.grid.major.x = element_blank()) + 
@@ -656,64 +652,48 @@ app$callback(
 
 #Callback for Tab3-Plot1
 app$callback(
-    list(output('plot-area5', 'figure'),
-         output('graph_5_title','children')),
+    output('plot-area5', 'figure'),
     list(input('popular_selector', 'value')),
     function(plot_type) {
         # Input: List of Regions
         # Output: Graph
-        #
-        
         sales_sub <- data.table(sales_data, key="Genre")[, head(.SD, 30), by=Genre]
-        
         if (plot_type == "Game_Title"){
             graph4 <- sales_sub %>%
                 ggplot() +
-                aes(x=reorder(Genre,-Copies_Sold), y=Copies_Sold) +
+                aes(x=reorder(Genre,-Copies_Sold), y=Copies_Sold, fill = Genre, color = Genre) +
                 geom_point() +
-                geom_text(aes(label=ifelse(Copies_Sold>max(Copies_Sold)*0.35,as.character(Name),'')),hjust=-0.1, vjust=0) +
-                theme_bw() +
-                theme(legend.title=element_blank()) +
-                theme(panel.grid.major.x = element_blank()) + 
+                geom_text(aes(label=ifelse(Copies_Sold>15,as.character(Name),'')),hjust=-0.1, vjust=0) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
                 #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
-            title <- "Top XX Game Titles by Genre"
         } else if (plot_type == "Publisher") {
             graph4 <- sales_sub %>%
                 group_by(Genre, Publisher) %>%
                 summarise(net_sales = sum(Copies_Sold), `.groups` = 'keep') %>%
                 ggplot() +
-                aes(x=reorder(Genre,-net_sales), y=net_sales) +
-                theme_bw() +
-                theme(panel.grid.major.x = element_blank()) + 
+                aes(x=reorder(Genre,-net_sales), y=net_sales, fill = Genre, color = Genre) +
                 geom_point() +
-                geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Publisher),'')),hjust=-0.1, vjust=0) +
+                geom_text(aes(label=ifelse(net_sales>50,as.character(Publisher),'')),hjust=-0.1, vjust=0) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
                 #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
-            title <- "Top XX Publishers by Genre"
         } else if (plot_type == "Platform") {
             graph4 <- sales_sub %>%
                 group_by(Genre, Platform) %>%
                 summarise(net_sales = sum(Copies_Sold), `.groups` = 'keep') %>%
                 ggplot() +
-                aes(x=reorder(Genre,-net_sales), y=net_sales) +
-                theme_bw() +
-                theme(legend.title=element_blank()) +
-                theme(panel.grid.major.x = element_blank()) + 
+                aes(x=reorder(Genre,-net_sales), y=net_sales, fill = Genre, color = Genre) +
                 geom_point() +
-                geom_text(aes(label=ifelse(net_sales>max(net_sales)*0.35,as.character(Platform),'')),hjust=-0.1, vjust=0) +
+                geom_text(aes(label=ifelse(net_sales>30,as.character(Platform),'')),hjust=-0.1, vjust=0) +
                 #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
-            title <- "Top XX Game Titles by Genre"
         }
-        
-        return (list(ggplotly(graph4),title))
+        return (ggplotly(graph4))
     }
 )
 

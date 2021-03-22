@@ -329,7 +329,7 @@ tab_3 = dccTab(label='Top Copies Sold', children=list(
                 dbcCol(list(
                     dbcCard(
                         dbcCardBody(list(
-                            htmlH3("Top XX observations by Genre"),
+                            htmlH3(id="graph_5_title"),
                             htmlBr(),
                             htmlLabel("Select your choice of interest:"),
                             dropdown_gamechoice,
@@ -656,7 +656,8 @@ app$callback(
 
 #Callback for Tab3-Plot1
 app$callback(
-    output('plot-area5', 'figure'),
+    list(output('plot-area5', 'figure'),
+         output('graph_5_title','children')),
     list(input('popular_selector', 'value')),
     function(plot_type) {
         # Input: List of Regions
@@ -678,6 +679,7 @@ app$callback(
                 #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
+            title <- "Top XX Game Titles by Genre"
         } else if (plot_type == "Publisher") {
             graph4 <- sales_sub %>%
                 group_by(Genre, Publisher) %>%
@@ -692,6 +694,7 @@ app$callback(
                 #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
+            title <- "Top XX Publishers by Genre"
         } else if (plot_type == "Platform") {
             graph4 <- sales_sub %>%
                 group_by(Genre, Platform) %>%
@@ -707,11 +710,12 @@ app$callback(
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
+            title <- "Top XX Game Titles by Genre"
         }
         
-        return (ggplotly(graph4))
+        return (list(ggplotly(graph4),title))
     }
 )
 
-app$run_server(host = '0.0.0.0')
-#app$run_server(debug=T)
+#app$run_server(host = '0.0.0.0')
+app$run_server(debug=T)

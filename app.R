@@ -664,7 +664,8 @@ app$callback(
 
 #Callback for Tab3-Plot1
 app$callback(
-    output('plot-area5', 'figure'),
+    list(output('plot-area5', 'figure'),
+         output('graph_5_title','children')),
     list(input('popular_selector', 'value')),
     function(plot_type) {
         # Input: List of Regions
@@ -685,6 +686,7 @@ app$callback(
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
+            title <- "Top Game Titles by Genre"
         } else if (plot_type == "Publisher") {
             graph4 <- sales_sub %>%
                 group_by(Genre, Publisher) %>%
@@ -702,6 +704,7 @@ app$callback(
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
+            title <- "Top Publishers by Genre"
         } else if (plot_type == "Platform") {
             graph4 <- sales_sub %>%
                 group_by(Genre, Platform) %>%
@@ -718,8 +721,9 @@ app$callback(
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
+            title <- "Top Game Titles by Genre"
         }
-        return (ggplotly(graph4))
+        return (list(ggplotly(graph4),title))
     }
 )
 

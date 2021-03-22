@@ -175,15 +175,26 @@ tab3_htu <- htmlDiv(list(
     )
 ))
 
-#Sidebar
-sidebar_card = dbcCard(
+
+# Tab modules
+tab1_components = 
+    htmlDiv(list(
+        htmlBr(),
+        htmlH3("Number of Games Released over Time"),
+        dccGraph(id='plot-area2'),
+        htmlBr(),
+        htmlH3("Number of Genres, Platforms and Publishers with Games Selling Over 100,000 Copies"),
+        dccGraph(id='plot-area3')
+    ))
+
+first_tab_sidebar_Card = dbcCard(
     dbcCardBody(htmlDiv(
         list(htmlH4("Dashboard for Video Games Statistics")
         )
     ))
 )
 
-sidebar_card_2 = dbcCard(
+first_tab_sidebar_Card_2 = dbcCard(
     dbcCardBody(htmlDiv(
         list(clearing_filters_button,htmlBr(),htmlBr(),
              htmlLabel("Select your region of interest:"),
@@ -205,48 +216,19 @@ sidebar_card_2 = dbcCard(
     ))
 )
 
-# Tab modules
-tab1_components = 
-    htmlDiv(list(
-        htmlBr(),
-        htmlH3("Number of Games Released over Time"),
-        dccGraph(id='plot-area2'),
-        htmlBr(),
-        htmlH3("Number of Genres, Platforms and Publishers with Games Selling Over 100,000 Copies"),
-        dccGraph(id='plot-area3')
-    ))
-
-tab2_components = 
-    htmlDiv(list(
-        htmlBr(),
-        htmlH3("Number of Copies Sold Over Time"),
-        dccGraph(id='plot-area'),
-        htmlBr(),
-        htmlH3("Total Number of Copies Sold by Genre"),
-        dccGraph(id='plot-area4')
-    ))
-
-tab3_components = 
-    htmlDiv(list(
-        htmlBr(),
-        htmlH3("Number of Games Released over Time"),
-        dccGraph(id='plot-area2'),
-        htmlBr(),
-        htmlH3("Number of Genres, Platforms and Publishers with Games Selling Over 100,000 Copies"),
-        dccGraph(id='plot-area3')
-    ))
 
 
-tab1_figures_card = dbcCard(
+
+first_tab_figures_card = dbcCard(
     dbcCardBody(htmlDiv(list(tab1_components))))
 
-tab2_figures_card = dbcCard(
-    dbcCardBody(htmlDiv(list(tab2_components))))
 
-tab3_figures_card = dbcCard(
-    dbcCardBody(htmlDiv(list(tab2_components))))
+row_tab1 = dbcRow(list(
+    dbcCol(first_tab_sidebar_Card, width = 3),
+    dbcCol(first_tab_figures_card), width = 9))
 
-tab1 = dccTab(label='Number of Games Released',children=list(
+
+tab_1 = dccTab(label='Number of Games Released',children=list(
     dbcCard(list(
         dbcCardBody(list(
             htmlP("This tab contains information regarding the trend of game releases across Genres, Platforms and Publishers."),
@@ -254,11 +236,12 @@ tab1 = dccTab(label='Number of Games Released',children=list(
         ))
     )),
     htmlBr(),
-    tab1_figures_card))
+    first_tab_figures_card))
 
 
 
-tab2 = dccTab(label='Number of Copies Sold', children=list(
+tab_2 = dccTab(label='Number of Copies Sold', children=list(
+    htmlDiv(list(
         dbcCard(list(
             dbcCardBody(list(
                 htmlP("This tab contains information regarding the number of copies sold across Genres, Platforms and Publishers."),
@@ -266,9 +249,19 @@ tab2 = dccTab(label='Number of Copies Sold', children=list(
             ))
         )),
         htmlBr(),
-        tab2_figures_card))
+        dbcCard(list(
+            dbcCardBody(list(
+                htmlH3("Number of Copies Sold Over Time"),
+                dccGraph(id='plot-area'),
+                htmlBr(),
+                htmlH3("Total Number of Copies Sold by Genre"),
+                dccGraph(id='plot-area4')
+            ))
+        ))
+    ))
+))
 
-tab3 = dccTab(label='Top Copies Sold', children=list(
+tab_3 = dccTab(label='Top Copies Sold', children=list(
     #Information at the Top
     htmlDiv(list(
         dbcCard(list(
@@ -333,7 +326,7 @@ tab3 = dccTab(label='Top Copies Sold', children=list(
                     color="success",
                     inverse=TRUE
                     )
-                ),width = 5),
+                ),width = 4),
                 #Graph
                 dbcCol(list(
                     dbcCard(
@@ -354,14 +347,14 @@ tab3 = dccTab(label='Top Copies Sold', children=list(
 
 app$layout(dbcRow(list(
     dbcCol(list(
-        htmlDiv(list(sidebar_card, htmlBr(), sidebar_card_2, htmlBr()))),width = 3),
+        htmlDiv(list(first_tab_sidebar_Card, htmlBr(), first_tab_sidebar_Card_2, htmlBr()))),width = 3),
     dbcCol(dbcContainer(
         (htmlDiv(htmlDiv(list(
             dccTabs(id="tabs", children=list(
-                tab1,tab2,tab3
+                tab_1,tab_2,tab_3
             ))
         ))
-        ))), width = 20)
+        ))), width = 9)
 )))
 
 #Callback for Button
@@ -643,26 +636,22 @@ app$callback(
         }
         min_year = years[1]
         max_year = years[2]
-        
-        filtered_subset <- game_melt %>% 
+        filtered_subset <- game_melt %>%
             subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year)
-        
         graph3 <- filtered_subset %>%
             group_by(Genre) %>%
             summarize(genre_sales = sum(Copies_Sold)) %>%
             ggplot() +
             aes(x=reorder(Genre,-genre_sales),
                 y=genre_sales,
-                fill=Genre) + 
+                fill=Genre,
+                text=paste("Genre: ", Genre,
+                           "<br>Copies Sold: ", genre_sales)) +
             geom_bar(stat="identity") +
-            theme_bw() +
-            theme(panel.grid.major.x = element_blank()) + 
-            theme(legend.position="none")+
             #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Copies Sold (in millions)") +
             xlab("Genre")
-        
-        return (ggplotly(graph3))
+        return (ggplotly(graph3,tooltip="text"))
     }
 )
 

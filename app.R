@@ -129,7 +129,8 @@ tab1_htu <- htmlDiv(list(
                 htmlP("- Use the `Reset Filters` button to return to default values."),
                 htmlP("- Plots will change with the filters on the sidebar."),
                 htmlP("- You can also filter the plots by clicking on their legends."),
-                htmlP("- If you put your mouse over any point in the plots, you will see a tooltip with further details.")
+                htmlP("- If you put your mouse over any point in the plots, you will see a tooltip with further details."),
+                htmlP("- Click the legend to remove/isolate variables of interest.")
             ))
         ))
     )
@@ -149,7 +150,8 @@ tab2_htu <- htmlDiv(list(
                 htmlP("- Use the `Reset Filters` button to return to default values."),
                 htmlP("- Plots will change with the filters on the sidebar."),
                 htmlP("- You can also filter the plots by clicking on their legends."),
-                htmlP("- If you put your mouse over any point in the plots, you will see a tooltip with further details.")
+                htmlP("- If you put your mouse over any point in the plots, you will see a tooltip with further details."),
+                htmlP("- Click the legend to remove/isolate variables of interest.")
             ))
         ))
     )
@@ -169,7 +171,8 @@ tab3_htu <- htmlDiv(list(
                 htmlP("- Both cards and plots will change with the filters on the sidebar."),
                 htmlP("- Use the `Reset Filters` button to return to default values."),
                 htmlP("- Use the dropdown to change the category of interest for the plot."),
-                htmlP("- If you put your mouse over any point in the plots, you will see a tooltip with further details.")
+                htmlP("- If you put your mouse over any point in the plots, you will see a tooltip with further details."),
+                htmlP("- Click the legend to remove/isolate variables of interest.")
             ))
         ))
     )
@@ -180,10 +183,10 @@ tab3_htu <- htmlDiv(list(
 tab1_components = 
     htmlDiv(list(
         htmlBr(),
-        htmlH3("Number of Games Released over Time"),
+        htmlH3("Number of Games Released Over Time"),
         dccGraph(id='plot-area2'),
         htmlBr(),
-        htmlH3("Number of Genres, Platforms and Publishers with Games Selling Over 100,000 Copies"),
+        htmlH3("Global Number of Genres, Platforms and Publishers with Games Selling Over 100,000 Copies"),
         dccGraph(id='plot-area3')
     ))
 
@@ -197,16 +200,16 @@ first_tab_sidebar_Card = dbcCard(
 first_tab_sidebar_Card_2 = dbcCard(
     dbcCardBody(htmlDiv(
         list(clearing_filters_button,htmlBr(),htmlBr(),
-             htmlLabel("Select your region of interest:"),
+             htmlLabel("Select your Region of Interest:"),
              dropdown_region,
              htmlBr(),
-             htmlLabel("Select your Platform of interest:"),
+             htmlLabel("Select your Platform of Interest:"),
              dropdown_platform,
              htmlBr(),
-             htmlLabel("Select your Genre of interest:"),
+             htmlLabel("Select your Genre of Interest:"),
              dropdown_genre,
              htmlBr(),
-             htmlLabel("Select your Publisher of interest:"),
+             htmlLabel("Select your Publisher of Interest:"),
              dropdown_publisher,
              htmlBr(),
              htmlLabel('Time Range'),
@@ -232,6 +235,7 @@ tab_1 = dccTab(label='Number of Games Released',children=list(
     dbcCard(list(
         dbcCardBody(list(
             htmlP("This tab contains information regarding the trend of game releases across Genres, Platforms and Publishers."),
+            htmlP("NOTE: Every game was released in every Region. Therefore, the Region filter will not change these values."),
             tab1_htu
         ))
     )),
@@ -276,7 +280,7 @@ tab_3 = dccTab(label='Top Copies Sold', children=list(
             dbcRow(list(
                 dbcCol(list(
                     dbcCard(list(
-                        dbcCardHeader("Game with most copies sold:"),
+                        dbcCardHeader("Game with Most Copies Sold:"),
                         dbcCardBody(list(
                             htmlH5(id="top_game",
                                    top_game_init$Name),
@@ -582,7 +586,7 @@ app$callback(
                 fill = Category,
                 group = 1,
                 text = paste("Year: ",as.factor(Year),
-                             "<br>No. of Succesful Gen, Publ, Plat: ",`Counts of Genres, Publishers and Platforms`,
+                             "<br>No. of Major Genre, Publishers, Platforms: ",`Counts of Genres, Publishers and Platforms`,
                              "<br>Category: ", Category)) + 
             geom_area(stat="identity")+
             theme_bw() +
@@ -590,7 +594,7 @@ app$callback(
             theme(panel.grid.major.x = element_blank()) + 
             theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
             #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
-            ylab("Counts of Sucessful Genres, Publishers and Platforms")+
+            ylab("Number of Major Genres, Publishers and Platforms")+
             xlab("Year")
         graph3<-ggplotly(graph3,tooltip="text")
         
@@ -648,6 +652,8 @@ app$callback(
                 text=paste("Genre: ", Genre,
                            "<br>Copies Sold: ", genre_sales)) +
             geom_bar(stat="identity") +
+            theme_bw() +
+            theme(legend.position = "none") + 
             #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Copies Sold (in millions)") +
             xlab("Genre")
@@ -702,5 +708,5 @@ app$callback(
     }
 )
 
-app$run_server(host = '0.0.0.0')
-#app$run_server(debug=T)
+#app$run_server(host = '0.0.0.0')
+app$run_server(debug=T)

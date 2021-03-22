@@ -25,8 +25,8 @@ graph1 <- game_melt %>%
     ggplot() +
     aes(x=Year,
         y=`Copies Sold`,
-        fill = Genre) + 
-    geom_bar(stat="identity")+
+        color = Genre) + 
+    geom_line()+
     theme_bw()+
     theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2)) +
     ylab("Number of Copies Sold (in millions)")
@@ -171,6 +171,20 @@ testfxc2 <-function(reg,plat,gen,pub,years) {
 ```
 
 ```{r}
+filtered_game_melt %>%
+    group_by(Year,Genre) %>%
+    summarise("Copies Sold" = sum(`Copies Sold`)) %>%
+    ggplot()+
+    aes(x=Year,
+        y=`Copies Sold`,
+        color=Genre)+
+    geom_line()+
+    theme_bw() +
+    theme(legend.title=element_blank()) +
+    theme(panel.grid.major.x = element_blank())
+```
+
+```{r}
 filter_region = list("JP_Sales")
 filter_plat = unique(game_melt$Platform)
 filter_gen = unique(game_melt$Genre)
@@ -178,38 +192,43 @@ filter_pub = unique(game_melt$Publisher)
 min_year = 1980
 max_year = 2017
 
-filtered_game_melt <- game_melt %>% 
-    subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year)
+ filtered_game_melt <- game_melt[,3:8] %>% 
+            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year)
 
-x <- filtered_game_melt %>%
-            melt(id.vars=c("Year"),measure.vars=c("Genre","Platform","Publisher")) %>%
-            rename(Category='variable') %>% 
-            group_by(Year,Category) %>%
-            unique() %>%
-            count(Year,Category) %>%
-            rename(`Counts of Genres, Publishers and Platforms`= n) %>% 
-            ggplot() +
-            aes(x=as.factor(Year),
-                y=`Counts of Genres, Publishers and Platforms`,
-                fill = Category,
-                text = paste("Year: ",as.factor(Year),
-                             "<br>No. of Succesful Gen, Publ, Plat: ",`Counts of Genres, Publishers and Platforms`,
-                             "<br>Category: ", Category)) + 
-            geom_bar(stat="identity")+
-            theme(legend.title=element_blank())+
-            theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2))+
-            ylab("Counts of Sucessful Genres, Publishers and Platforms")+
-            xlab("Year")
-ggplotly(x,tooltip="text")
+graph1 <-  filtered_game_melt %>%
+    group_by(Year,Genre) %>%
+    summarise("Copies Sold" = sum(`Copies Sold`)) %>% 
+    ggplot() +
+    aes(x=Year,
+        y=`Copies Sold`,
+        color = Genre,
+        group = 1,
+        text = paste("Year: ",Year,
+                     "<br>Copies Sold: ",`Copies Sold`,
+                     "<br>Genre: ", Genre)) + 
+    geom_line()+
+    theme_bw() +
+    theme(legend.title=element_blank()) +
+    theme(panel.grid.major.x = element_blank()) + 
+    theme(axis.text.x = element_text(angle = 90, hjust=0.95, vjust=0.2)) +
+    #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
+    ylab("Number of Copies Sold (in millions)")+
+    xlab("Year")
+ggplotly(graph1,tooltip="text")
+
 ```
+
 ```{r}
-test <- 1
-if (test %% 2 == 0){
-    print("Close")
-} else {
-    print(!FALSE)
-}
-state(FALSE)
+filter_region = list("JP_Sales")
+filter_plat = list("XOne")
+filter_gen = unique(game_melt$Genre)
+filter_pub = unique(game_melt$Publisher)
+min_year = 1980
+max_year = 1990
+
+filtered_game_melt <- game_melt[,3:8] %>% 
+    subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year)
+filtered_game_melt
 ```
 
 

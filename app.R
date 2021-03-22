@@ -653,6 +653,7 @@ app$callback(
                            "<br>Copies Sold: ", genre_sales)) +
             geom_bar(stat="identity") +
             theme_bw() +
+            theme(panel.grid.major.x = element_blank()) + 
             theme(legend.position = "none") + 
             #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Copies Sold (in millions)") +
@@ -675,8 +676,13 @@ app$callback(
                 aes(x=reorder(Genre,-Copies_Sold), y=Copies_Sold, fill = Genre, color = Genre) +
                 geom_point() +
                 geom_text(aes(label=ifelse(Copies_Sold>15,as.character(Name),'')),hjust=-0.1, vjust=0) +
-                theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9))+
+                theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
+                theme_bw() +
+                theme(panel.grid.major.x = element_blank()) + 
+                theme(legend.position = "none") +
+                theme(axis.title.x = element_blank()) + 
                 #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
+                theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
         } else if (plot_type == "Publisher") {
@@ -688,7 +694,12 @@ app$callback(
                 geom_point() +
                 geom_text(aes(label=ifelse(net_sales>50,as.character(Publisher),'')),hjust=-0.1, vjust=0) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
+                theme_bw() +
+                theme(panel.grid.major.x = element_blank()) + 
+                theme(legend.position = "none") +
+                theme(axis.title.x = element_blank()) +
                 #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
+                theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
         } else if (plot_type == "Platform") {
@@ -699,6 +710,10 @@ app$callback(
                 aes(x=reorder(Genre,-net_sales), y=net_sales, fill = Genre, color = Genre) +
                 geom_point() +
                 geom_text(aes(label=ifelse(net_sales>30,as.character(Platform),'')),hjust=-0.1, vjust=0) +
+                theme_bw() +
+                theme(panel.grid.major.x = element_blank()) + 
+                theme(legend.position = "none") +
+                theme(axis.title.x = element_blank()) + 
                 #scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
                 ylab("Number of Copies Sold (in millions)") +

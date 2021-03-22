@@ -721,7 +721,7 @@ app$callback(
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
                 ylab("Number of Copies Sold (in millions)") +
                 xlab("Genre")
-            title <- "Top Game Titles by Genre"
+            title <- "Top Platforms by Genre"
         }
         return (list(ggplotly(graph4),title))
     }

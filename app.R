@@ -491,7 +491,8 @@ app$callback(
 app$callback(
     list(output('plot-area', 'figure'),
          output('plot-area2', 'figure'),
-         output('plot-area3', 'figure')),
+         output('plot-area3', 'figure'),
+         output('plot-area4', 'figure')),
     list(input('region_selector', 'value'),
          input('platform_selector', 'value'),
          input('genre_selector', 'value'),
@@ -598,51 +599,7 @@ app$callback(
             xlab("Year")
         graph3<-ggplotly(graph3,tooltip="text")
         
-        return(list(graph1,graph2,graph3))
-    }
-)
-
-#Callback for linking time sliders
-
-
-
-#Callback for Tab2-Plot2
-app$callback(
-    output('plot-area4', 'figure'),
-    list(input('region_selector', 'value'),
-         input('platform_selector', 'value'),
-         input('genre_selector', 'value'),
-         input('publisher_selector', 'value'),
-         input('year_selector', 'value')),
-    function(reg,plat,gen,pub,years) {
-        #Input: List of Regions, Platforms, Genres, Publishers, Min and Max Year
-        #Output: Name & Sales of Top Game
-        #
-        if ("Global_Sales" %in% reg){
-            filter_region = list("Global_Sales")
-        } else {
-            filter_region = reg
-        }
-        if ("all" %in% plat){
-            filter_plat = unique(game_melt$Platform)
-        } else {
-            filter_plat = plat
-        }
-        if ("all" %in% gen){
-            filter_gen = unique(game_melt$Genre)
-        } else {
-            filter_gen = gen
-        }
-        if ("all" %in% pub){
-            filter_pub = unique(game_melt$Publisher)
-        } else {
-            filter_pub = pub
-        }
-        min_year = years[1]
-        max_year = years[2]
-        filtered_subset <- game_melt %>%
-            subset(Region %in% filter_region & Platform %in% filter_plat & Genre %in% filter_gen & Publisher %in% filter_pub & Year >= min_year & Year <= max_year)
-        graph3 <- filtered_subset %>%
+        graph4 <- filtered_game_melt %>%
             group_by(Genre) %>%
             summarize(genre_sales = sum(Copies_Sold)) %>%
             ggplot() +
@@ -658,9 +615,13 @@ app$callback(
             #scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) +
             ylab("Number of Copies Sold (in millions)") +
             xlab("Genre")
-        return (ggplotly(graph3,tooltip="text"))
+        graph4<- ggplotly(graph4,tooltip="text")
+        
+        return(list(graph1,graph2,graph3,graph4))
     }
 )
+
+#Callback for linking time sliders
 
 #Callback for Tab3-Plot1
 app$callback(
@@ -727,5 +688,5 @@ app$callback(
     }
 )
 
-app$run_server(host = '0.0.0.0')
-#app$run_server(debug=T)
+#app$run_server(host = '0.0.0.0')
+app$run_server(debug=T)

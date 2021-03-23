@@ -635,8 +635,13 @@ app$callback(
         if (plot_type == "Game_Title"){
             graph4 <- sales_sub %>%
                 ggplot() +
-                aes(x=reorder(Genre,-Copies_Sold), y=Copies_Sold, fill = Genre, color = Genre) +
-                geom_point() +
+                aes(x=reorder(Genre,-Copies_Sold), 
+                    y=Copies_Sold, 
+                    fill = Genre, 
+                    color = Genre,
+                    text=paste("Genre: ", Genre,
+                               "<br>Copies Sold: ", Copies_Sold)) +
+                geom_point() + 
                 geom_text(aes(label=ifelse(Copies_Sold>15,as.character(Name),'')),hjust=-0.1, vjust=0) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
                 theme_bw() +
@@ -653,7 +658,12 @@ app$callback(
                 group_by(Genre, Publisher) %>%
                 summarise(net_sales = sum(Copies_Sold), `.groups` = 'keep') %>%
                 ggplot() +
-                aes(x=reorder(Genre,-net_sales), y=net_sales, fill = Genre, color = Genre) +
+                aes(x=reorder(Genre,-net_sales), 
+                    y=net_sales, 
+                    fill = Genre, 
+                    color = Genre,
+                    text=paste("Genre: ", Genre,
+                               "<br>Copies Sold: ", net_sales)) +
                 geom_point() +
                 geom_text(aes(label=ifelse(net_sales>50,as.character(Publisher),'')),hjust=-0.1, vjust=0) +
                 theme(axis.text.x = element_text(angle=45, hjust=0.9, vjust=0.9)) +
@@ -671,7 +681,12 @@ app$callback(
                 group_by(Genre, Platform) %>%
                 summarise(net_sales = sum(Copies_Sold), `.groups` = 'keep') %>%
                 ggplot() +
-                aes(x=reorder(Genre,-net_sales), y=net_sales, fill = Genre, color = Genre) +
+                aes(x=reorder(Genre,-net_sales), 
+                    y=net_sales, 
+                    fill = Genre, 
+                    color = Genre,
+                    text=paste("Genre: ", Genre,
+                               "<br>Copies Sold: ", net_sales)) +
                 geom_point() +
                 geom_text(aes(label=ifelse(net_sales>30,as.character(Platform),'')),hjust=-0.1, vjust=0) +
                 theme_bw() +
@@ -684,7 +699,7 @@ app$callback(
                 xlab("Genre")
             title <- "Top Platforms by Genre"
         }
-        return (list(ggplotly(graph4),title))
+        return (ggplotly(graph4,tooltip="text"))
     }
 )
 

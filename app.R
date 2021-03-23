@@ -699,7 +699,7 @@ app$callback(
                 xlab("Genre")
             title <- "Top Platforms by Genre"
         }
-        return (ggplotly(graph4,tooltip="text"))
+        return (list(ggplotly(graph4,tooltip="text"),title))
     }
 )
 

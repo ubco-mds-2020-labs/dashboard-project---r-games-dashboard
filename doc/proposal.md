@@ -18,3 +18,18 @@ For example, imagine you are part of a small development team and want to make a
 While the example was for a smaller company, the same can be applied for larger corporations as they create new titles and try to expand into other areas in the industry. While a big named developer might not be too concerned with competition, they may want to look at the top performers in a genre or platform of interest and see if there are any similarities that may have contributed to their success before expanding into an area not within their expertise.  
 
 Our app can even be expanded outside of the game development field. Since our app shows users what the trends in the gaming industry are, people involved with the entertainment side, such as Streamers, may find this helpful in choosing what game they want to stream.
+
+We will walk through two hypothetical use-cases and present how our dashboard can help our users in their daily life business.
+
+## Usage Scenario 1
+
+Consider David who is a small-scale stock broker on the WallStreet and is interested in Technology stocks. He has an idea about most of the tech companies. He knows about the GameStop Corp. since its inception in 80s as Babbage Corporation. Later on this company changed its name to GameStop Corporation in late 90s. He has the idea that this company deals with diverse businesses like tech & gaming magazines, retail shops and gaming consoles. Since 2010 they started some joint ventures with other compnanies like Insomniac Games to release video games. They have released a mix of various action and adventure games.
+
+With this background David can surely benefit from our Video Games Dashboard. From the first tab of 'No. of Games Released' he can get his desired information. From the sidebar, he needs to select the appropriate genre of games (action, adventure) and from the slider he needs to filter the results by year (2010 to 2016). He sees that the upper plot gives insight that the new releases of action and adventure games were decreasing over this period. Lower plot gives him the idea that 2010 onwards, game publishing companies were decreasing in numbers. This along with some other insights would have lead him to buy the GameStop stocks while they were underdogs at $17 per share and would be a millionare when the stocks now are at around $300.
+
+## Usage Scenario 2
+
+Tom is a tech news reporter in a popular newspaper. His news editor asks him to write an article on the popular gaming consoles and games released in the past five years. Though he is a tech reporter, like most of us he don't remember all game related statistics over the top of his head. For this task he takes help from our Video Game Dashboard. He goes to tab 3 "Top Games, Genre, Platforms & Publishers", sets time period from 2014 to 2016. For this duration he sees all the desired statistics on the score cards. He can see that the most popular game during this period was Grand Theft Auto 5, with  over 56 million copies sold. Similarly he sees that the action games were the most popular among the gamers during these years.
+ 
+
+

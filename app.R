@@ -10,7 +10,8 @@ library(dplyr)
 library(data.table)
 
 #Create App
-app <- Dash$new(name = "Video Game Statistics",external_stylesheets = dbcThemes$BOOTSTRAP)
+app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
+app$title("Video Game Statistics")
 
 #Read in data/wrangle
 #game <- readr::read_csv(here::here('data', 'vgsales.csv'))
@@ -703,5 +704,5 @@ app$callback(
     }
 )
 
-app$run_server(host = '0.0.0.0')
-#app$run_server(debug=T)
+#app$run_server(host = '0.0.0.0')
+app$run_server(debug=T)

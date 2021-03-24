@@ -10,7 +10,7 @@ library(dplyr)
 library(data.table)
 
 #Create App
-app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
+app <- Dash$new(name = "Video Game Statistics",external_stylesheets = dbcThemes$BOOTSTRAP)
 
 #Read in data/wrangle
 #game <- readr::read_csv(here::here('data', 'vgsales.csv'))

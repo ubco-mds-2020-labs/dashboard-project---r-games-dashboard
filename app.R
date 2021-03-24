@@ -11,6 +11,7 @@ library(data.table)
 
 #Create App
 app <- Dash$new(external_stylesheets = dbcThemes$BOOTSTRAP)
+app$title("Video Game Statistics")
 
 #Read in data/wrangle
 #game <- readr::read_csv(here::here('data', 'vgsales.csv'))
@@ -183,10 +184,10 @@ tab3_htu <- htmlDiv(list(
 tab1_components = 
     htmlDiv(list(
         htmlBr(),
-        htmlH3("Number of Games Released Over Time"),
+        htmlH3("Number of Games Released Over the Years"),
         dccGraph(id='plot-area2'),
         htmlBr(),
-        htmlH3("Global Number of Genres, Platforms and Publishers with Games Selling Over 100,000 Copies"),
+        htmlH3("Global Number of Genres, Platforms and Publishers"),
         dccGraph(id='plot-area3')
     ))
 
@@ -255,7 +256,7 @@ tab_2 = dccTab(label='Number of Copies Sold', children=list(
         htmlBr(),
         dbcCard(list(
             dbcCardBody(list(
-                htmlH3("Number of Copies Sold Over Time"),
+                htmlH3("Number of Copies Sold Over the Years"),
                 dccGraph(id='plot-area'),
                 htmlBr(),
                 htmlH3("Total Number of Copies Sold by Genre"),
